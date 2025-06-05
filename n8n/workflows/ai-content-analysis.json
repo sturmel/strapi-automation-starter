@@ -1,0 +1,242 @@
+{
+  "name": "Analyse IA et Génération de Contenu",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression", 
+              "value": "0 9 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "weekly-schedule",
+      "name": "Weekly Schedule (Monday 9AM)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  AVG(sessions) as avg_sessions,\n  AVG(users) as avg_users,\n  AVG(bounce_rate) as avg_bounce_rate,\n  traffic_source,\n  COUNT(*) as data_points\nFROM marketing_ops.google_analytics_data \nWHERE date_collected >= CURRENT_DATE - INTERVAL '7 days'\nGROUP BY traffic_source\nORDER BY avg_sessions DESC\nLIMIT 10"
+      },
+      "id": "get-analytics-data",
+      "name": "Get Recent Analytics",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery", 
+        "query": "SELECT \n  keyword,\n  AVG(position) as avg_position,\n  domain,\n  COUNT(*) as tracking_days\nFROM marketing_ops.serpbear_rankings \nWHERE date_collected >= CURRENT_DATE - INTERVAL '7 days'\n  AND position <= 20\nGROUP BY keyword, domain\nORDER BY avg_position ASC\nLIMIT 20"
+      },
+      "id": "get-seo-data",
+      "name": "Get SEO Performance",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [460, 500],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  platform,\n  AVG(engagement_rate) as avg_engagement,\n  SUM(likes + comments + shares) as total_interactions,\n  COUNT(*) as posts_count\nFROM marketing_ops.social_media_data \nWHERE date_collected >= CURRENT_DATE - INTERVAL '7 days'\nGROUP BY platform\nORDER BY avg_engagement DESC"
+      },
+      "id": "get-social-data",
+      "name": "Get Social Media Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [460, 700],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const analyticsData = $input.all()[0].json;\nconst seoData = $input.all()[1].json;\nconst socialData = $input.all()[2].json;\n\n// Construire le prompt pour l'IA\nconst prompt = `Analyse marketing hebdomadaire:\n\nDonnées Analytics (7 derniers jours):\n${analyticsData.map(d => `- ${d.traffic_source}: ${d.avg_sessions} sessions moyennes, ${d.avg_bounce_rate}% bounce rate`).join('\\n')}\n\nPerformances SEO (top keywords):\n${seoData.map(d => `- \"${d.keyword}\": position ${d.avg_position} sur ${d.domain}`).join('\\n')}\n\nRéseaux sociaux:\n${socialData.map(d => `- ${d.platform}: ${d.avg_engagement}% engagement, ${d.total_interactions} interactions`).join('\\n')}\n\nGénère 3 recommandations d'amélioration et 5 idées de contenu basées sur ces données. Format JSON avec {recommendations: [], content_ideas: []}.`;\n\nreturn [{ json: { prompt, analytics: analyticsData, seo: seoData, social: socialData } }];"
+      },
+      "id": "prepare-ai-prompt",
+      "name": "Prepare AI Prompt",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [680, 500]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "openAiApi",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "model": "gpt-4",
+          "messages": [
+            {
+              "role": "system",
+              "content": "Tu es un expert en marketing digital. Analyse les données fournies et donne des recommandations précises et actionnables."
+            },
+            {
+              "role": "user", 
+              "content": "={{ $json.prompt }}"
+            }
+          ],
+          "max_tokens": 1000,
+          "temperature": 0.7
+        }
+      },
+      "id": "openai-analysis",
+      "name": "OpenAI Analysis",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [900, 500],
+      "credentials": {
+        "openAiApi": {
+          "id": "openai-main",
+          "name": "OpenAI Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const aiResponse = $json.choices[0].message.content;\nlet analysis;\n\ntry {\n  analysis = JSON.parse(aiResponse);\n} catch (e) {\n  // Fallback si le JSON n'est pas valide\n  analysis = {\n    recommendations: [aiResponse.substring(0, 500)],\n    content_ideas: ['Créer du contenu basé sur les données analytics']\n  };\n}\n\nconst items = [];\n\n// Créer les suggestions de contenu\nanalysis.content_ideas.forEach((idea, index) => {\n  items.push({\n    json: {\n      suggestion_type: 'content_idea',\n      title: `Idée de contenu ${index + 1}`,\n      content: idea,\n      priority: index + 1,\n      ai_model_used: 'gpt-4',\n      confidence_score: 0.8,\n      data_sources: ['google_analytics', 'serpbear', 'social_media']\n    }\n  });\n});\n\n// Créer les recommandations\nanalysis.recommendations.forEach((rec, index) => {\n  items.push({\n    json: {\n      suggestion_type: 'recommendation',\n      title: `Recommandation ${index + 1}`,\n      content: rec,\n      priority: index + 1,\n      ai_model_used: 'gpt-4',\n      confidence_score: 0.9,\n      data_sources: ['google_analytics', 'serpbear', 'social_media']\n    }\n  });\n});\n\nreturn items;"
+      },
+      "id": "process-ai-response",
+      "name": "Process AI Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1120, 500]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "marketing_ops",
+        "table": "ai_content_suggestions",
+        "columns": "suggestion_type, title, content, priority, ai_model_used, confidence_score, data_sources",
+        "additionalFields": {}
+      },
+      "id": "save-suggestions",
+      "name": "Save AI Suggestions",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1340, 500],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Weekly Schedule (Monday 9AM)": {
+      "main": [
+        [
+          {
+            "node": "Get Recent Analytics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get SEO Performance", 
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Social Media Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recent Analytics": {
+      "main": [
+        [
+          {
+            "node": "Prepare AI Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get SEO Performance": {
+      "main": [
+        [
+          {
+            "node": "Prepare AI Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Social Media Data": {
+      "main": [
+        [
+          {
+            "node": "Prepare AI Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare AI Prompt": {
+      "main": [
+        [
+          {
+            "node": "OpenAI Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Analysis": {
+      "main": [
+        [
+          {
+            "node": "Process AI Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process AI Response": {
+      "main": [
+        [
+          {
+            "node": "Save AI Suggestions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "id": "ai-content-analysis-weekly"
+}

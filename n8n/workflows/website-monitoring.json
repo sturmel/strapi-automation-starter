@@ -1,0 +1,199 @@
+{
+  "name": "Website Monitoring",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "value": "*/15 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-15min",
+      "name": "Every 15 Minutes",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "urls",
+              "value": "=[\n  \"http://website:3000\",\n  \"http://strapi:1337\",\n  \"http://nocodb:8080\",\n  \"http://n8n:5678\",\n  \"http://metabase:3000\",\n  \"http://serpbear:3000\"\n]"
+            }
+          ]
+        }
+      },
+      "id": "define-urls",
+      "name": "Define URLs to Monitor",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const urls = JSON.parse($json.urls);\nconst items = [];\n\nfor (const url of urls) {\n  items.push({ json: { url } });\n}\n\nreturn items;"
+      },
+      "id": "split-urls",
+      "name": "Split URLs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "options": {
+          "timeout": 10000,
+          "followRedirect": true
+        }
+      },
+      "id": "check-website",
+      "name": "Check Website",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const startTime = Date.now();\nconst url = $input.first().json.url;\nconst response = $input.first();\n\nlet statusCode = null;\nlet responseTime = null;\nlet contentLength = null;\nlet title = '';\nlet isAvailable = false;\nlet errorMessage = '';\n\nif (response.json && !response.error) {\n  // Succès\n  statusCode = response.json.status || 200;\n  responseTime = Date.now() - startTime;\n  contentLength = response.json.headers ? response.json.headers['content-length'] || 0 : 0;\n  isAvailable = statusCode >= 200 && statusCode < 400;\n  \n  // Extraire le titre si c'est du HTML\n  if (response.json.data && typeof response.json.data === 'string') {\n    const titleMatch = response.json.data.match(/<title[^>]*>([^<]+)<\\/title>/i);\n    if (titleMatch) {\n      title = titleMatch[1].trim();\n    }\n  }\n} else {\n  // Erreur\n  isAvailable = false;\n  errorMessage = response.error ? response.error.message : 'Unknown error';\n  statusCode = response.error ? response.error.code : 0;\n}\n\nreturn [{\n  json: {\n    url: url,\n    status_code: statusCode,\n    response_time: responseTime,\n    content_length: contentLength,\n    title: title,\n    is_available: isAvailable,\n    error_message: errorMessage,\n    date_checked: new Date().toISOString(),\n    ssl_valid: url.startsWith('https') ? true : null\n  }\n}];"
+      },
+      "id": "process-response",
+      "name": "Process Response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1120, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "database": "marketing_ops",
+        "table": "website_content_monitor",
+        "columns": "url_checked, http_status_code, extracted_title, is_available, fetch_timestamp",
+        "additionalFields": {}
+      },
+      "id": "save-monitoring-data",
+      "name": "Save Monitoring Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1340, 300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": "={{ $json.is_available }}",
+              "value2": false
+            }
+          ]
+        }
+      },
+      "id": "check-if-down",
+      "name": "Check if Down",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1340, 500]
+    },
+    {
+      "parameters": {
+        "functionCode": "// Logique d'alerte simple\nconst url = $json.url;\nconst error = $json.error_message;\nconst statusCode = $json.status_code;\n\nconst alertMessage = `🚨 ALERTE SITE WEB\\n\\nURL: ${url}\\nStatut: ${statusCode}\\nErreur: ${error}\\nHeure: ${new Date().toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}\\n\\n⚠️ Vérifiez immédiatement le service.`;\n\nreturn [{\n  json: {\n    alert_message: alertMessage,\n    url: url,\n    severity: 'critical'\n  }\n}];"
+      },
+      "id": "format-alert",
+      "name": "Format Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1560, 500]
+    }
+  ],
+  "connections": {
+    "Every 15 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Define URLs to Monitor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Define URLs to Monitor": {
+      "main": [
+        [
+          {
+            "node": "Split URLs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split URLs": {
+      "main": [
+        [
+          {
+            "node": "Check Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Website": {
+      "main": [
+        [
+          {
+            "node": "Process Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Response": {
+      "main": [
+        [
+          {
+            "node": "Save Monitoring Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check if Down",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Down": {
+      "main": [
+        [
+          {
+            "node": "Format Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "Europe/Paris"
+  },
+  "id": "website-monitoring"
+}

@@ -1,0 +1,164 @@
+{
+  "name": "Collecte SerpBear Rankings",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "value": "0 5 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-daily-seo",
+      "name": "Daily Schedule (5AM)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "http://serpbear:3000/api/keywords",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "httpHeaderAuth": {
+          "name": "Authorization",
+          "value": "Bearer {{ $env.SERPBEAR_API_KEY }}"
+        },
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "serpbear-api",
+      "name": "Get SerpBear Keywords",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "functionCode": "const keywords = $input.all()[0].json;\nconst items = [];\n\nif (Array.isArray(keywords)) {\n  for (const keyword of keywords) {\n    // Récupérer l'historique des positions pour chaque mot-clé\n    if (keyword.lastResult && keyword.lastResult.length > 0) {\n      const lastResult = keyword.lastResult[0];\n      \n      items.push({\n        json: {\n          keyword_id: keyword.ID,\n          keyword: keyword.keyword,\n          domain: keyword.domain,\n          country: keyword.country || 'fr',\n          device: keyword.device || 'desktop',\n          search_engine: 'google',\n          position: lastResult.position || null,\n          url: lastResult.url || '',\n          date_collected: new Date().toISOString().split('T')[0],\n          search_volume: keyword.volume || null,\n          difficulty: keyword.difficulty || null,\n          raw_data: JSON.stringify(keyword)\n        }\n      });\n    }\n  }\n}\n\nreturn items;"
+      },
+      "id": "process-serpbear-data",
+      "name": "Process SerpBear Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO marketing_ops.serpbear_rankings \n(domain, keyword, search_engine, country, device, position, url, date_collected, search_volume, difficulty, raw_data)\nVALUES \n{{ $json.map(item => \n  `('${item.domain}', '${item.keyword.replace(/'/g, \"''\")}', '${item.search_engine}', '${item.country}', '${item.device}', ${item.position || 'NULL'}, '${item.url.replace(/'/g, \"''\")}', '${item.date_collected}', ${item.search_volume || 'NULL'}, ${item.difficulty || 'NULL'}, '${item.raw_data.replace(/'/g, \"''\")}')`\n).join(',\\n') }}\nON CONFLICT (domain, keyword, search_engine, country, device, date_collected) \nDO UPDATE SET \n  position = EXCLUDED.position,\n  url = EXCLUDED.url,\n  search_volume = EXCLUDED.search_volume,\n  difficulty = EXCLUDED.difficulty,\n  raw_data = EXCLUDED.raw_data,\n  updated_at = NOW();"
+      },
+      "id": "upsert-rankings",
+      "name": "Upsert Rankings",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "-- Calculer les changements de position par rapport à la veille\nUPDATE marketing_ops.serpbear_rankings sr1\nSET change_from_previous = (\n  CASE \n    WHEN sr2.position IS NOT NULL AND sr1.position IS NOT NULL \n    THEN sr2.position - sr1.position\n    ELSE 0\n  END\n)\nFROM marketing_ops.serpbear_rankings sr2\nWHERE sr1.domain = sr2.domain \n  AND sr1.keyword = sr2.keyword\n  AND sr1.search_engine = sr2.search_engine\n  AND sr1.country = sr2.country\n  AND sr1.device = sr2.device\n  AND sr1.date_collected = CURRENT_DATE\n  AND sr2.date_collected = CURRENT_DATE - INTERVAL '1 day';"
+      },
+      "id": "calculate-changes",
+      "name": "Calculate Position Changes",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1120, 300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT \n  COUNT(*) as total_keywords,\n  AVG(position) as avg_position,\n  COUNT(CASE WHEN change_from_previous > 0 THEN 1 END) as improved_positions,\n  COUNT(CASE WHEN change_from_previous < 0 THEN 1 END) as declined_positions\nFROM marketing_ops.serpbear_rankings \nWHERE date_collected = CURRENT_DATE \n  AND position IS NOT NULL;"
+      },
+      "id": "get-summary",
+      "name": "Get Daily Summary",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1340, 300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Schedule (5AM)": {
+      "main": [
+        [
+          {
+            "node": "Get SerpBear Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get SerpBear Keywords": {
+      "main": [
+        [
+          {
+            "node": "Process SerpBear Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process SerpBear Data": {
+      "main": [
+        [
+          {
+            "node": "Upsert Rankings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upsert Rankings": {
+      "main": [
+        [
+          {
+            "node": "Calculate Position Changes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Position Changes": {
+      "main": [
+        [
+          {
+            "node": "Get Daily Summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "Europe/Paris"
+  },
+  "id": "serpbear-rankings-collector"
+}

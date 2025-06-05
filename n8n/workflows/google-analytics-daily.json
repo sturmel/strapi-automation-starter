@@ -1,0 +1,154 @@
+{
+  "name": "Collecte Quotidienne Google Analytics",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "value": "0 3 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-daily",
+      "name": "Daily Schedule (3AM)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "resource": "report",
+        "operation": "get",
+        "propertyId": "={{ $env.GOOGLE_ANALYTICS_PROPERTY_ID }}",
+        "dateRanges": {
+          "values": [
+            {
+              "startDate": "yesterday",
+              "endDate": "yesterday"
+            }
+          ]
+        },
+        "dimensions": {
+          "values": [
+            {
+              "name": "date"
+            },
+            {
+              "name": "sessionSource"
+            },
+            {
+              "name": "deviceCategory"
+            },
+            {
+              "name": "country"
+            }
+          ]
+        },
+        "metrics": {
+          "values": [
+            {
+              "name": "sessions"
+            },
+            {
+              "name": "users"
+            },
+            {
+              "name": "newUsers"
+            },
+            {
+              "name": "pageviews"
+            },
+            {
+              "name": "bounceRate"
+            },
+            {
+              "name": "averageSessionDuration"
+            }
+          ]
+        }
+      },
+      "id": "google-analytics",
+      "name": "Google Analytics",
+      "type": "n8n-nodes-base.googleAnalytics",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "googleAnalyticsOAuth2Api": {
+          "id": "google-analytics-oauth",
+          "name": "Google Analytics OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const items = [];\n\nfor (const row of $input.all()[0].json.rows) {\n  const dimensions = row.dimensionValues;\n  const metrics = row.metricValues;\n  \n  items.push({\n    property_id: $env.GOOGLE_ANALYTICS_PROPERTY_ID,\n    date_collected: dimensions[0].value,\n    traffic_source: dimensions[1].value,\n    device_category: dimensions[2].value,\n    country: dimensions[3].value,\n    sessions: parseInt(metrics[0].value) || 0,\n    users: parseInt(metrics[1].value) || 0,\n    new_users: parseInt(metrics[2].value) || 0,\n    page_views: parseInt(metrics[3].value) || 0,\n    bounce_rate: parseFloat(metrics[4].value) || 0,\n    avg_session_duration: parseFloat(metrics[5].value) || 0,\n    metric_name: 'daily_summary',\n    metric_value: parseInt(metrics[0].value) || 0,\n    raw_data: JSON.stringify(row)\n  });\n}\n\nreturn items.map(item => ({ json: item }));"
+      },
+      "id": "process-data",
+      "name": "Process GA Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "marketing_ops",
+        "table": "google_analytics_data",
+        "columns": "property_id, date_collected, traffic_source, device_category, country, sessions, users, new_users, page_views, bounce_rate, avg_session_duration, metric_name, metric_value, raw_data",
+        "additionalFields": {}
+      },
+      "id": "postgres-insert",
+      "name": "Insert to PostgreSQL",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [900, 300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Schedule (3AM)": {
+      "main": [
+        [
+          {
+            "node": "Google Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Analytics": {
+      "main": [
+        [
+          {
+            "node": "Process GA Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process GA Data": {
+      "main": [
+        [
+          {
+            "node": "Insert to PostgreSQL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {},
+  "id": "google-analytics-daily-collector"
+}
