@@ -207,6 +207,98 @@ services:
       retries: 5
       start_period: 60s
 
+  # Nuxt 3 - Website Frontend
+  website:
+    container_name: nuxt_website
+    build: ./docker/nuxt
+    restart: unless-stopped
+    environment:
+      # Configuration Node.js
+      NODE_ENV: ${NODE_ENV}
+      NITRO_HOST: 0.0.0.0
+      NITRO_PORT: 3000
+      
+      # Redis pour les sessions Nuxt (base 2)
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 2
+      
+      # Configuration API URLs
+      STRAPI_URL: http://strapi:1337
+      API_BASE_URL: http://localhost:1337
+      
+      # Configuration domaines
+      DOMAIN_WEBSITE: ${DOMAIN_WEBSITE}
+      DOMAIN_STRAPI: ${DOMAIN_STRAPI}
+      DOMAIN_NOCODB: ${DOMAIN_NOCODB}
+      DOMAIN_N8N: ${DOMAIN_N8N}
+      DOMAIN_METABASE: ${DOMAIN_METABASE}
+      DOMAIN_SERPBEAR: ${DOMAIN_SERPBEAR}
+      DOMAIN_PGADMIN: ${DOMAIN_PGADMIN}
+      
+      # Configuration timezone
+      TZ: ${TIMEZONE}
+      TIMEZONE: ${TIMEZONE}
+      
+      # Base de données PostgreSQL
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      
+      # Configuration Strapi
+      STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
+      
+      # Google APIs
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      GOOGLE_TAG: ${GOOGLE_ANALYTICS_PROPERTY_ID}
+      GOOGLE_ANALYTICS_PROPERTY_ID: ${GOOGLE_ANALYTICS_PROPERTY_ID}
+      GOOGLE_ADS_CUSTOMER_ID: ${GOOGLE_ADS_CUSTOMER_ID}
+      
+      # Brevo (ex-Sendinblue)
+      BREVO_API_KEY: ${BREVO_API_KEY}
+      BREVO_WEBHOOK_SECRET: ${BREVO_WEBHOOK_SECRET}
+      
+      # Réseaux Sociaux
+      FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
+      FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
+      INSTAGRAM_ACCESS_TOKEN: ${INSTAGRAM_ACCESS_TOKEN}
+      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID}
+      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET}
+      
+      # IA et APIs
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      GOOGLE_VERTEX_AI_PROJECT_ID: ${GOOGLE_VERTEX_AI_PROJECT_ID}
+      GOOGLE_VERTEX_AI_LOCATION: ${GOOGLE_VERTEX_AI_LOCATION}
+      
+      # SerpBear
+      SERPBEAR_API_KEY: ${SERPBEAR_API_KEY}
+      
+      # Configuration de session
+      SESSION_SECRET: ${SESSION_SECRET:-nuxt-session-secret-key-change-in-production}
+      
+      # URLs de l'application
+      WEBSITE_URL: http://localhost:3333
+      WEBHOOK_URL: http://localhost:5678/webhook
+    volumes:
+      - ./html/website:/app
+      - website_node_modules:/app/node_modules
+    ports:
+      - "3333:3000"
+    networks:
+      - automation_network
+    depends_on:
+      - redis
+      - strapi
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
 
 volumes:
   postgres_data:
@@ -217,6 +309,7 @@ volumes:
   metabase_data:
   serpbear_data:
   strapi_app_data:
+  website_node_modules:
 
 
 networks:

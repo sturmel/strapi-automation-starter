@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+@theme {
+
+}
+
+@layer base {
+    html {
+      font-size: 16px;
+      overflow-x: hidden;
+    }
+}  
