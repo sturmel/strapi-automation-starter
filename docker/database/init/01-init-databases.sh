@@ -1,44 +1,50 @@
 #!/bin/bash
 set -e
 
+echo "Création des bases de données PostgreSQL..."
+echo "Bases de données à créer:"
+echo "  - strapi_cms"
+echo "  - nocodb_app"
+echo "  - n8n_workflows"
+echo "  - metabase_analytics"
+echo "  - serpbear_seo"
+echo "  - brevo"
+echo "  - google_data"
+echo "  - social_network_data"
+echo "  - marketing_ops"
+
+# Fonction pour créer une base de données si elle n'existe pas
+create_database_if_not_exists() {
+    local db_name=$1
+    echo "Création de la base de données: $db_name"
+    
+    # Vérifier si la base de données existe déjà
+    db_exists=$(psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" -tAc "SELECT 1 FROM pg_database WHERE datname='$db_name'")
+    
+    if [ "$db_exists" != "1" ]; then
+        echo "Création de la base de données $db_name..."
+        psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" -c "CREATE DATABASE \"$db_name\";"
+        echo "Base de données $db_name créée avec succès"
+    else
+        echo "Base de données $db_name existe déjà"
+    fi
+    
+    # Accorder les privilèges
+    psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" -c "GRANT ALL PRIVILEGES ON DATABASE \"$db_name\" TO \"$POSTGRES_USER\";"
+}
+
 # Création des bases de données pour chaque service
-psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
-    -- Création des bases de données principales
-    SELECT 'CREATE DATABASE nocodb'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'nocodb')\gexec
-    
-    SELECT 'CREATE DATABASE n8n'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'n8n')\gexec
-    
-    SELECT 'CREATE DATABASE metabase'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'metabase')\gexec
-    
-    SELECT 'CREATE DATABASE serpbear'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'serpbear')\gexec
-    
-    -- Bases de données pour les données marketing
-    SELECT 'CREATE DATABASE brevo'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'brevo')\gexec
-    
-    SELECT 'CREATE DATABASE google_data'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'google_data')\gexec
-    
-    SELECT 'CREATE DATABASE social_network_data'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'social_network_data')\gexec
-    
-    SELECT 'CREATE DATABASE marketing_ops'
-    WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'marketing_ops')\gexec
-    
-    -- Octroi des privilèges
-    GRANT ALL PRIVILEGES ON DATABASE nocodb TO $POSTGRES_USER;
-    GRANT ALL PRIVILEGES ON DATABASE n8n TO $POSTGRES_USER;
-    GRANT ALL PRIVILEGES ON DATABASE metabase TO $POSTGRES_USER;
-    GRANT ALL PRIVILEGES ON DATABASE serpbear TO $POSTGRES_USER;
-    GRANT ALL PRIVILEGES ON DATABASE brevo TO $POSTGRES_USER;
-    GRANT ALL PRIVILEGES ON DATABASE google_data TO $POSTGRES_USER;
-    GRANT ALL PRIVILEGES ON DATABASE social_network_data TO $POSTGRES_USER;
-    GRANT ALL PRIVILEGES ON DATABASE marketing_ops TO $POSTGRES_USER;
-EOSQL
+create_database_if_not_exists "strapi_cms"
+create_database_if_not_exists "nocodb_app"
+create_database_if_not_exists "n8n_workflows"
+create_database_if_not_exists "metabase_analytics"
+create_database_if_not_exists "serpbear_seo"
+create_database_if_not_exists "brevo"
+create_database_if_not_exists "google_data"
+create_database_if_not_exists "social_network_data"
+create_database_if_not_exists "marketing_ops"
+
+echo "Toutes les bases de données ont été créées avec leurs privilèges!"
 
 # Initialisation de la base Brevo pour les événements email
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "brevo" <<-EOSQL
@@ -464,4 +470,4 @@ psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "marketing_ops" <<-
 EOSQL
 
 echo "Base de données PostgreSQL initialisée avec succès!"
-echo "Bases créées: nocodb, n8n, metabase, serpbear, brevo, google_data, social_network_data, marketing_ops"
+echo "Bases créées: $STRAPI_DB_NAME, $NOCODB_DB_NAME, $N8N_DB_NAME, $METABASE_DB_NAME, $SERPBEAR_DB_NAME, brevo, google_data, social_network_data, marketing_ops"
