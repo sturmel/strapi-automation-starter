@@ -1,8 +1,8 @@
 # 🚀 Strapi Automation Starter
 
-**Plateforme d'automatisation marketing complète avec IA, analytics et workflows avancés**
+**Site web d'entreprise moderne avec CMS headless et outils d'administration**
 
-Cette plateforme est un écosystème complet d'automatisation marketing qui combine CMS headless, intelligence artificielle, analytics avancés et workflows automatisés pour créer et gérer des sites web d'entreprise de manière autonome et intelligente.
+Cette plateforme permet de créer rapidement un site web d'entreprise moderne basé sur Nuxt 3 et Strapi, avec des outils d'administration, d'analytics et d'automatisation. Idéale pour les entreprises qui souhaitent un site performant avec un CMS flexible et des capacités d'extension via n8n.
 
 ## 📋 Table des Matières
 
@@ -25,21 +25,25 @@ Cette plateforme est un écosystème complet d'automatisation marketing qui comb
 
 ### Concept
 
-Cette plateforme permet de **créer automatiquement des sites web d'entreprise** connectés à un écosystème d'outils marketing avancés. Chaque déploiement crée un site Nuxt 3 personnalisé, alimenté par un CMS Strapi, avec des workflows n8n intelligents qui automatisent :
+Cette plateforme permet de **créer des sites web d'entreprise modernes** avec un CMS headless Strapi et un écosystème d'outils d'administration et d'analyse. Chaque déploiement crée un site Nuxt 3 performant, alimenté par un CMS Strapi, avec des workflows n8n pour les automatisations :
 
-- ✅ **Génération de contenu IA** basée sur les performances analytics
-- ✅ **Suivi SEO automatisé** avec alertes et recommandations
-- ✅ **Analytics multi-plateformes** (Google Analytics, réseaux sociaux, email)
-- ✅ **Monitoring et alertes** en temps réel
-- ✅ **Rapports et dashboards** automatisés
-- ✅ **Intégrations marketing** (Brevo, Google Ads, réseaux sociaux)
+- ✅ **Site web d'entreprise** moderne et performant avec blog
+- ✅ **CMS headless** pour la gestion de contenu
+- ✅ **Analytics** avec Google Analytics et Metabase
+- ✅ **Suivi SEO** avec SerpBear
+- ✅ **Workflows d'automatisation** via n8n
+- ✅ **Base de données centralisée** PostgreSQL avec interfaces d'administration
 
 ### Philosophie
 
-**"Déployez une fois, automatisez tout"** - Chaque instance de cette plateforme devient un hub marketing autonome capable de :
+**"Simplicité et performance"** - Chaque instance de cette plateforme est un site web d'entreprise moderne qui :
 
-1. 🎨 **Créer du contenu** basé sur les données de performance
-2. 📊 **Analyser les tendances** et suggérer des optimisations
+1. 🎨 **Affiche du contenu** géré via le CMS Strapi
+2. 📊 **Collecte des analytics** avec Google Analytics
+3. 🔍 **Suit son positionnement SEO** via SerpBear
+4. 🔧 **Permet l'administration** des données via des interfaces dédiées
+5. 🤖 **Offre des automatisations** via n8n pour les intégrations tierces
+6. 📈 **Génère des rapports** visuels avec Metabase
 3. 🔍 **Monitorer le SEO** et alerter sur les changements
 4. 📧 **Gérer les campagnes email** et leur performance
 5. 🌐 **Surveiller la disponibilité** des services
@@ -75,9 +79,7 @@ graph TB
     
     subgraph "External APIs"
         GA[Google Analytics]
-        BR[Brevo Email]
-        OAI[OpenAI]
-        FB[Social Media]
+        APIs[APIs via n8n]
     end
     
     W --> A
@@ -91,9 +93,7 @@ graph TB
     PA --> P
     
     N --> GA
-    N --> BR
-    N --> OAI
-    N --> FB
+    N --> APIs
     N --> S
     N --> M
 ```
@@ -102,44 +102,117 @@ graph TB
 
 | **Couche** | **Technologies** | **Rôle** |
 |------------|------------------|----------|
-| **Frontend** | Nuxt 3, Vue.js, TypeScript | Sites web dynamiques et performants |
+| **Frontend** | Nuxt 3, Vue.js, TypeScript | Sites web d'entreprise performants |
 | **Backend** | Strapi, Node.js | CMS headless et API REST/GraphQL |
 | **Base de Données** | PostgreSQL 15, Redis 7 | Stockage principal et cache |
-| **Automatisation** | n8n, Workflows JSON | Orchestration et intégrations |
-| **Analytics** | Metabase, Custom Dashboards | Visualisation et reporting |
-| **SEO** | SerpBear, Google APIs | Suivi de positionnement |
-| **IA** | OpenAI GPT-4, Vertex AI | Génération et analyse de contenu |
-| **Orchestration** | Docker Compose | Déploiement et scaling |
+| **Automatisation** | n8n, Workflows JSON | Automatisations et intégrations configurables |
+| **Analytics** | Metabase, Google Analytics | Visualisation et suivi des performances |
+| **SEO** | SerpBear | Suivi de positionnement |
+| **Administration** | pgAdmin, NocoDB | Interfaces de gestion des données |
+| **Orchestration** | Docker Compose | Déploiement et conteneurisation |
 
 ## 🔧 Services Inclus
 
 ### 🌐 Nuxt 3 Website (`website:3000` → `:3333`)
-**Site web frontend moderne et performant**
+**Site web d'entreprise moderne avec stack technologique avancé**
 
-**Fonctionnalités :**
-- 🔥 **Server-Side Rendering (SSR)** pour un SEO optimal
-- ⚡ **Static Site Generation (SSG)** pour les performances
-- 🎨 **Composants Vue.js réactifs** avec TypeScript
-- 📱 **Design responsive** et PWA-ready
-- 🔗 **Intégration native Strapi** via API REST/GraphQL
-- 🌍 **Multi-langues** et internationalisation
-- 🔍 **SEO automatisé** avec méta-tags dynamiques
+**🚀 Technologies de pointe intégrées :**
+- **Nuxt 3.17.5** : Framework Vue.js full-stack avec SSR/SSG
+- **Vue 3.5.16** + **TypeScript** : Développement moderne et typé
+- **TailwindCSS 4.1.3** avec **@tailwindcss/vite** : Design system modulaire
+- **GSAP** : Animations fluides et performantes
+- **ESLint 9.0** : Qualité de code garantie
 
-**APIs Intégrées :**
-- Google Analytics & Tag Manager
-- Brevo (ex-Sendinblue) pour les newsletters
-- Réseaux sociaux (Facebook, Instagram, LinkedIn)
-- OpenAI pour le contenu généré par IA
-- SerpBear pour les données SEO
+**🔍 SEO et référencement optimisé :**
+- 🔥 **Server-Side Rendering (SSR)** pour indexation parfaite
+- ⚡ **Static Site Generation (SSG)** avec pré-rendu intelligent
+- 🤖 **JSON-LD structuré** via `nuxt-jsonld` pour le référencement IA
+- 📊 **Google Analytics 4** avec `nuxt-gtag` intégré
+- 🔍 **Meta-tags dynamiques** générés automatiquement
+- 📱 **Core Web Vitals** optimisés avec compression automatique
+- 🗺️ **Sitemap XML** et robots.txt automatiques
 
-**Variables d'environnement principales :**
+**🎨 Interface utilisateur moderne :**
+- 📱 **Design responsive** avec TailwindCSS 4
+- ✨ **Animations GSAP** pour l'engagement utilisateur
+- 🖼️ **Optimisation d'images** avec `@nuxt/image`
+- 🔤 **Gestion des polices** avec `@nuxt/fonts`
+- 🎯 **Icônes** vectorielles avec `@nuxt/icon`
+- 🌐 **PWA-ready** avec manifeste automatique
+
+**🔗 Intégrations et APIs :**
+- 📡 **Strapi CMS** via API REST/GraphQL
+- 📊 **Google Analytics 4** tracking avancé
+- 🔐 **Session management** sécurisé côté serveur
+- 🔗 **Scripts tiers** optimisés avec `@nuxt/scripts`
+- 🧪 **Tests automatisés** avec `@nuxt/test-utils`
+
+**🚀 Performances et optimisations :**
+- 📦 **Compression automatique** des assets
+- 🗂️ **Code splitting** intelligent
+- 💾 **Cache optimisé** avec stratégies adaptatives
+- ⚡ **Hydration selective** pour temps de chargement minimal
+- 🔄 **Hot reload** en développement
+
+**Variables d'environnement (.env) :**
 ```bash
-STRAPI_URL=http://strapi:1337
-API_BASE_URL=http://localhost:1337
-GOOGLE_ANALYTICS_PROPERTY_ID=your_property_id
-BREVO_API_KEY=your_brevo_key
-OPENAI_API_KEY=your_openai_key
+# Configuration essentielle du site web
+STRAPI_URL=http://strapi:1337              # URL du CMS Strapi
+STRAPI_API_TOKEN=your_strapi_api_token     # Token d'accès Strapi
+SESSION_SECRET=your_secure_session_secret   # Clé sessions sécurisées
+
+# Analytics (optionnel)
+GOOGLE_ANALYTICS_PROPERTY_ID=123456789     # Google Analytics 4
+GOOGLE_TAG=G-XXXXXXXXXX                    # Alternative Google Tag
+
+# Configuration générale
+NODE_ENV=development                        # Environment
 ```
+
+**Exemple d'utilisation JSON-LD pour l'IA :**
+```typescript
+// Données structurées automatiques pour référencement IA
+export default {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Votre Entreprise',
+  url: 'https://votre-site.com',
+  description: 'Description optimisée pour l\'IA',
+  sameAs: ['https://linkedin.com/company/...']
+}
+```
+
+**🎨 Animations et Interactivité GSAP :**
+```typescript
+// plugins/gsap.client.ts - Animations fluides
+import { gsap } from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+export default defineNuxtPlugin(() => {
+  gsap.registerPlugin(ScrollTrigger)
+  
+  // Animations au scroll pour engagement utilisateur
+  gsap.from('.hero-title', {
+    duration: 1,
+    y: 100,
+    opacity: 0,
+    ease: 'power2.out'
+  })
+  
+  // Animations de cartes au survol
+  gsap.set('.card', {
+    transformOrigin: 'center center'
+  })
+})
+```
+
+**Types d'animations disponibles :**
+- ✨ **Hero sections** avec effets parallax
+- 🏃 **Animations au scroll** (ScrollTrigger)
+- 🃏 **Hover effects** sur boutons/cartes
+- 📄 **Transitions de pages** fluides
+- 🎯 **Call-to-action** animés pour conversion
+- 📱 **Animations responsive** optimisées mobile
 
 ---
 
@@ -175,240 +248,68 @@ OPENAI_API_KEY=your_openai_key
 ---
 
 ### 🤖 n8n Automation (`n8n:5678`)
-**Orchestrateur d'automatisation marketing avec 5 workflows prêts**
+**Plateforme d'automatisation pour intégrations tierces**
 
-#### 1. 🧠 **Analyse IA et Génération de Contenu** (`ai-content-analysis.json`)
-**Workflow hebdomadaire (Lundi 9h) - Génération intelligente de contenu**
+n8n vous permet de créer des workflows d'automatisation pour connecter votre site aux services externes. Configurez facilement vos intégrations via l'interface graphique sans avoir besoin de gérer des variables d'environnement complexes.
 
-```mermaid
-graph LR
-    A[Lundi 9h] --> B[Récupère Analytics]
-    A --> C[Récupère SEO]
-    A --> D[Récupère Social Media]
-    B --> E[Analyse IA GPT-4]
-    C --> E
-    D --> E
-    E --> F[Sauvegarde Suggestions]
-```
+**Fonctionnalités principales :**
+- 🔗 **Interface graphique** pour créer des workflows
+- 🔐 **Gestion centralisée** des credentials API
+- ⏰ **Planification** de tâches automatiques
+- 📊 **Collecte de données** depuis services externes
+- 💾 **Stockage** des résultats en base PostgreSQL
 
-**Fonctionnalités :**
-- 📊 **Analyse des données** Google Analytics (7 derniers jours)
-- 🔍 **Performance SEO** via SerpBear (mots-clés, positions)
-- 📱 **Données réseaux sociaux** (engagement, interactions)
-- 🤖 **Analyse IA GPT-4** pour générer :
-  - 3 recommandations d'amélioration marketing
-  - 5 idées de contenu basées sur les performances
-- 💾 **Stockage intelligent** dans PostgreSQL pour Metabase
+**Configuration des intégrations :**
+Toutes les APIs tierces (OpenAI, Brevo, réseaux sociaux, etc.) se configurent directement dans n8n via l'interface Credentials, ce qui sépare clairement la configuration du site web et les automatisations.
 
-**Tables générées :**
-```sql
-marketing_ops.ai_content_suggestions (
-  suggestion_type VARCHAR, -- 'content_idea' ou 'recommendation'
-  title VARCHAR,
-  content TEXT,
-  priority INTEGER,
-  ai_model_used VARCHAR,
-  confidence_score DECIMAL,
-  data_sources JSONB
-)
-```
-
-#### 2. 📧 **Collecte Données Brevo Email** (`brevo-email-events.json`)
-**Webhook temps réel - Tracking événements email**
-
-**Événements trackés :**
-- ✉️ **Emails envoyés** (`sent`)
-- 📬 **Emails ouverts** (`opened`)
-- 🖱️ **Clics sur liens** (`clicked`)
-- ⚠️ **Bounces** (`bounced`)
-- 🚫 **Désabonnements** (`unsubscribed`)
-- 📧 **Plaintes spam** (`spam`)
-
-**Endpoint webhook :**
-```
-POST http://your-domain:5678/webhook/brevo-webhook
-```
-
-**Configuration Brevo :**
-1. Aller dans Brevo → Paramètres → Webhooks
-2. Ajouter l'URL ci-dessus
-3. Sélectionner tous les événements email
-4. Secret webhook : `BREVO_WEBHOOK_SECRET`
-
-#### 3. 📊 **Collecte Google Analytics** (`google-analytics-daily.json`)
-**Quotidien 3h du matin - Analytics automatisés**
-
-**Métriques collectées :**
-- 👥 **Sessions et utilisateurs** (nouveaux/récurrents)
-- 📄 **Pages vues** et temps de session
-- 📱 **Répartition par device** (mobile/desktop/tablet)
-- 🌍 **Géolocalisation** des visiteurs
-- 🔗 **Sources de trafic** (organic/social/direct/referral)
-- ⚡ **Taux de rebond** et engagement
-
-**Configuration Google Analytics :**
-1. Créer un projet Google Cloud Console
-2. Activer l'API Google Analytics Data
-3. Créer des credentials OAuth2
-4. Configurer `GOOGLE_ANALYTICS_PROPERTY_ID`
-
-#### 4. 🔍 **SerpBear Rankings** (`serpbear-rankings.json`)
-**Quotidien 5h du matin - Suivi SEO automatisé**
-
-**Fonctionnalités avancées :**
-- 📈 **Positions Google** pour tous vos mots-clés
-- 📊 **Évolution des positions** (comparaison jour précédent)
-- 🎯 **Calcul automatique** des gains/pertes
-- 📱 **Suivi multi-device** (mobile/desktop)
-- 🌍 **Géolocalisation** des recherches
-- ⚠️ **Alertes** en cas de chute significative
-
-**Algorithme de calcul des changements :**
-```sql
--- Calcul automatique des évolutions
-UPDATE serpbear_rankings sr1
-SET change_from_previous = (
-  CASE 
-    WHEN sr2.position IS NOT NULL AND sr1.position IS NOT NULL 
-    THEN sr2.position - sr1.position
-    ELSE 0
-  END
-)
-WHERE sr1.date_collected = CURRENT_DATE
-  AND sr2.date_collected = CURRENT_DATE - INTERVAL '1 day'
-```
-
-#### 5. 🔍 **Website Monitoring** (`website-monitoring.json`)
-**Toutes les 15 minutes - Surveillance infrastructure**
-
-**Services surveillés :**
-- 🌐 **Website Nuxt** (`http://website:3000`)
-- 📝 **Strapi CMS** (`http://strapi:1337`)
-- 🗄️ **NocoDB** (`http://nocodb:8080`)
-- 🤖 **n8n Interface** (`http://n8n:5678`)
-- 📊 **Metabase** (`http://metabase:3000`)
-- 🔍 **SerpBear** (`http://serpbear:3000`)
-
-**Métriques collectées :**
-- ⏱️ **Temps de réponse** (ms)
-- 📊 **Code de statut HTTP**
-- 📏 **Taille de contenu**
-- 🏷️ **Titre de page** extrait
-- ⚠️ **Alertes automatiques** en cas de panne
+**Exemples d'usage :**
+- Génération de contenu avec OpenAI
+- Envoi d'emails marketing via Brevo
+- Collecte d'analytics Google
+- Suivi SEO automatisé
+- Monitoring de disponibilité
 
 ---
 
 ### 🗄️ PostgreSQL (`postgres:5432`)
-**Base de données principale avec 6 databases spécialisées**
+**Base de données principale avec bases spécialisées**
 
 #### Structure des bases :
 
 ```sql
--- 1. automation_hub (base principale)
-CREATE DATABASE automation_hub;
-
--- 2. strapi_cms (contenu et API)
+-- 1. strapi_cms (contenu et API)
 CREATE DATABASE strapi_cms;
 
--- 3. nocodb_app (interface no-code)
+-- 2. nocodb_app (interface no-code)
 CREATE DATABASE nocodb_app;
 
--- 4. n8n_workflows (workflows et historique)
+-- 3. n8n_workflows (workflows et historique)
 CREATE DATABASE n8n_workflows;
 
--- 5. metabase_analytics (configuration dashboards)
+-- 4. metabase_analytics (configuration dashboards)
 CREATE DATABASE metabase_analytics;
 
--- 6. serpbear_seo (données SEO)
+-- 5. serpbear_seo (données SEO)
 CREATE DATABASE serpbear_seo;
 ```
 
-#### Schéma marketing_ops (analytics centralisés) :
+#### Utilisation par service :
 
+- **Strapi CMS** : Stockage du contenu, médias, utilisateurs
+- **n8n** : Historique des workflows et configurations
+- **Metabase** : Configuration des dashboards et rapports
+- **SerpBear** : Suivi des positions SEO
+- **NocoDB** : Interface d'administration des données
+
+#### Tables automatiques créées par les services :
 ```sql
--- Google Analytics Data
-CREATE TABLE marketing_ops.google_analytics_data (
-  property_id VARCHAR,
-  date_collected DATE,
-  traffic_source VARCHAR,
-  device_category VARCHAR,
-  country VARCHAR,
-  sessions INTEGER,
-  users INTEGER,
-  new_users INTEGER,
-  page_views INTEGER,
-  bounce_rate DECIMAL,
-  avg_session_duration DECIMAL,
-  metric_name VARCHAR,
-  metric_value DECIMAL,
-  raw_data JSONB
-);
-
--- SerpBear Rankings
-CREATE TABLE marketing_ops.serpbear_rankings (
-  domain VARCHAR,
-  keyword VARCHAR,
-  search_engine VARCHAR DEFAULT 'google',
-  country VARCHAR DEFAULT 'fr',
-  device VARCHAR DEFAULT 'desktop',
-  position INTEGER,
-  url VARCHAR,
-  date_collected DATE,
-  search_volume INTEGER,
-  difficulty INTEGER,
-  change_from_previous INTEGER,
-  raw_data JSONB,
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
--- Brevo Email Events
-CREATE TABLE marketing_ops.brevo_email_events (
-  event_type VARCHAR, -- sent, opened, clicked, bounced, etc.
-  email VARCHAR,
-  subject VARCHAR,
-  campaign_id VARCHAR,
-  message_id VARCHAR,
-  recipient_email VARCHAR,
-  tags JSONB,
-  event_date TIMESTAMP
-);
-
--- AI Content Suggestions
-CREATE TABLE marketing_ops.ai_content_suggestions (
-  suggestion_type VARCHAR, -- content_idea, recommendation
-  title VARCHAR,
-  content TEXT,
-  priority INTEGER,
-  ai_model_used VARCHAR,
-  confidence_score DECIMAL,
-  data_sources JSONB,
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Website Monitoring
-CREATE TABLE marketing_ops.website_monitoring (
-  url_checked VARCHAR,
-  http_status_code INTEGER,
-  response_time_ms INTEGER,
-  content_length INTEGER,
-  extracted_title VARCHAR,
-  is_available BOOLEAN,
-  error_message TEXT,
-  fetch_timestamp TIMESTAMP DEFAULT NOW()
-);
-
--- Social Media Data (extensible)
-CREATE TABLE marketing_ops.social_media_data (
-  platform VARCHAR, -- facebook, instagram, linkedin
-  post_id VARCHAR,
-  content TEXT,
-  likes INTEGER,
-  comments INTEGER,
-  shares INTEGER,
-  reach INTEGER,
-  engagement_rate DECIMAL,
-  date_collected DATE,
-  raw_data JSONB
+-- Exemples de tables selon vos workflows n8n
+CREATE TABLE workflow_results (
+  id SERIAL PRIMARY KEY,
+  workflow_name VARCHAR,
+  execution_date TIMESTAMP,
+  data JSONB,
+  status VARCHAR
 );
 ```
 
@@ -417,62 +318,48 @@ CREATE TABLE marketing_ops.social_media_data (
 ### 🚀 Redis (`redis:6379`)
 **Cache haute performance et sessions**
 
-#### Répartition des databases Redis :
-
-```bash
-# DB 0: Strapi CMS (sessions, cache contenu)
-# DB 1: NocoDB cache
-# DB 2-15: Disponibles pour workflows n8n personnalisés
-```
-
-**Utilisations spécifiques :**
+**Utilisations :**
 - 🔄 **Cache Strapi** : Contenu, requêtes API, sessions admin
-- ⚡ **Cache NocoDB** : Résultats de requêtes, configurations
-- 🤖 **Workflows n8n** : États temporaires, rate limiting
-- 🌐 **Sessions website** : Authentification utilisateurs
+- ⚡ **Cache général** : Données fréquemment utilisées
+- 🤖 **Support n8n** : États temporaires des workflows
+- 🌐 **Sessions website** : Gestion des sessions utilisateur
 
 ---
 
 ### 📊 Metabase (`metabase:3000`)
 **Plateforme d'analytics et dashboards**
 
-#### Dashboards pré-configurés :
+#### Dashboards configurables :
 
-1. **📈 Marketing Overview**
-   - Évolution du trafic (Google Analytics)
-   - Performance SEO (SerpBear)
-   - Engagement email (Brevo)
-   - ROI par canal
+1. **📈 Business Overview**
+   - Évolution du trafic web
+   - Performance générale du site
+   - Métriques personnalisées
+   - Données issues de vos workflows n8n
 
 2. **🔍 SEO Performance**
-   - Top mots-clés et évolutions
-   - Analyse de la concurrence
+   - Suivi des mots-clés (SerpBear)
+   - Évolution des positions
    - Opportunités d'amélioration
    - Corrélations trafic/positions
 
-3. **📧 Email Marketing**
-   - Taux d'ouverture et clics
-   - Segmentation audiences
-   - A/B testing résultats
-   - Performance par campagne
+3. **📊 Données Personnalisées**
+   - Données collectées via n8n
+   - Métriques métier spécifiques
+   - Tableaux de bord sur mesure
+   - Rapports automatisés
 
-4. **🤖 AI Insights**
-   - Suggestions de contenu générées
-   - Score de confiance IA
-   - Tendances identifiées
-   - ROI des recommandations
-
-5. **🛡️ Infrastructure Monitoring**
+4. **🛡️ Infrastructure Monitoring**
    - Disponibilité des services
    - Temps de réponse
    - Alertes et incidents
    - Performance globale
 
-**Configuration automatique :**
+**Configuration flexible :**
 - Connexion PostgreSQL préconfigurée
-- Questions et dashboards importés
-- Alertes email automatiques
+- Dashboards adaptables selon vos besoins
 - Export PDF/CSV programmé
+- Intégration avec vos workflows n8n
 
 ---
 
@@ -517,17 +404,17 @@ DELETE /api/keywords/{id} - Supprimer un mot-clé
 
 **Cas d'usage :**
 - ✏️ **Gestion du contenu** Strapi sans technique
-- 📊 **Visualisation des analytics** simplifié
-- 📝 **Saisie manuelle** de données marketing
+- 📊 **Visualisation des données** collectées par n8n
+- 📝 **Saisie manuelle** de données personnalisées
 - 🎯 **Gestion des mots-clés** SEO
-- 👥 **Base de contacts** et leads
-- 📋 **Todo lists** et projets marketing
+- 👥 **Base de contacts** et données métier
+- 📋 **Todo lists** et gestion de projets
 
 **Configuration :**
 - Base PostgreSQL partagée
 - Redis pour le cache
 - Authentification JWT
-- Connexion directe aux tables marketing_ops
+- Connexion directe aux tables de données
 
 ---
 
@@ -548,128 +435,94 @@ DELETE /api/keywords/{id} - Supprimer un mot-clé
 - Utilisateur admin configuré
 - Dashboards de monitoring inclus
 
-## 🔄 Workflows Automatisés
+## 🔄 Workflows Configurables
 
-### 🕐 Planning d'Exécution
+### 🕐 Exemple de Planning d'Exécution
 
 ```mermaid
 gantt
-    title Planning des Workflows Automatisés
+    title Workflows Flexibles (Configurables selon vos besoins)
     dateFormat  HH:mm
     axisFormat %H:%M
 
     section Quotidien
-    Google Analytics     :03:00, 30m
-    SerpBear Rankings    :05:00, 45m
+    Data Collection      :03:00, 30m
+    Content Sync         :05:00, 45m
     
     section Continu
     Website Monitoring   :00:00, 24h
-    Brevo Webhooks      :00:00, 24h
+    API Webhooks        :00:00, 24h
     
     section Hebdomadaire
-    AI Content Analysis  :crit, 09:00, 2h
+    Analytics Reports    :crit, 09:00, 2h
 ```
 
-### 🔄 Flux de Données
+### 🔄 Flux de Données Flexible
 
 ```mermaid
 graph TD
-    A[Sources Externes] --> B[n8n Workflows]
+    A[APIs Externes] --> B[n8n Workflows]
     B --> C[PostgreSQL]
     C --> D[Metabase Dashboards]
     C --> E[NocoDB Interface]
     B --> F[Strapi CMS]
     F --> G[Nuxt Website]
     
-    subgraph "Sources Externes"
+    subgraph "APIs Configurables"
         A1[Google Analytics]
-        A2[Brevo Email]
+        A2[Email Services]
         A3[SerpBear API]
         A4[OpenAI API]
-        A5[Social Media APIs]
+        A5[APIs Personnalisées]
     end
     
-    subgraph "Analytics Storage"
-        C1[Google Analytics Data]
-        C2[Email Events]
+    subgraph "Stockage de Données"
+        C1[Analytics Data]
+        C2[API Responses]
         C3[SEO Rankings]
-        C4[AI Suggestions]
-        C5[Monitoring Data]
+        C4[Workflow Results]
+        C5[Custom Data]
     end
 ```
 
-### 📊 Métriques et KPIs Automatisés
+### 📊 Métriques Configurables
 
-| **Métrique** | **Fréquence** | **Source** | **Action Automatique** |
-|--------------|---------------|------------|------------------------|
-| **Trafic Web** | Quotidien | Google Analytics | Génération contenu IA si baisse >10% |
-| **Positions SEO** | Quotidien | SerpBear | Alerte si chute >5 positions |
-| **Email Performance** | Temps réel | Brevo | Segmentation automatique audiences |
-| **Uptime Services** | 15 min | Monitoring | Notification immédiate si panne |
-| **Engagement Social** | Hebdomadaire | APIs Social | Suggestions posts IA |
+| **Type de Données** | **Fréquence** | **Source** | **Automatisation Possible** |
+|---------------------|---------------|------------|------------------------------|
+| **Trafic Web** | Configurable | Google Analytics | Alertes personnalisées |
+| **Positions SEO** | Quotidien | SerpBear | Notifications de changements |
+| **Données API** | Temps réel | APIs diverses | Traitement automatique |
+| **Monitoring Services** | 15 min | Workflows n8n | Notifications d'incidents |
+| **Données Métier** | Personnalisable | APIs configurées | Actions selon vos règles |
 
 ## 🔗 Interconnexions et APIs
 
-### 🌐 APIs Externes Intégrées
+### 🌐 Configuration des intégrations
 
-#### Google Ecosystem
+#### Site Web (Nuxt)
 ```bash
-# Google Analytics Data API v1
-GOOGLE_ANALYTICS_PROPERTY_ID=123456789
-GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your_client_secret
-
-# Google Ads API (optionnel)
-GOOGLE_ADS_CUSTOMER_ID=123-456-7890
-
-# Google Vertex AI pour IA avancée
-GOOGLE_VERTEX_AI_PROJECT_ID=your_project_id
-GOOGLE_VERTEX_AI_LOCATION=europe-west1
+# Variables essentielles pour le site
+STRAPI_URL=http://strapi:1337
+STRAPI_API_TOKEN=your_strapi_api_token
+GOOGLE_ANALYTICS_PROPERTY_ID=123456789  # Optionnel
+SESSION_SECRET=your_secure_session_secret
 ```
 
-#### Brevo (ex-Sendinblue)
+#### Workflows n8n
+**Toutes les APIs tierces sont configurées dans n8n via l'interface Credentials :**
+
+- **Google Analytics** : pour récupérer les données de trafic
+- **OpenAI** : pour génération de contenu IA
+- **Brevo** : pour email marketing et newsletters  
+- **Réseaux sociaux** : Facebook, LinkedIn, Instagram
+- **APIs diverses** : selon vos besoins d'automatisation
+
+#### Avantages de cette approche
 ```bash
-# API v3 complète
-BREVO_API_KEY=xkeysib-your_brevo_api_key
-BREVO_WEBHOOK_SECRET=your_webhook_secret
-
-# Fonctionnalités disponibles :
-# - Envoi emails transactionnels
-# - Gestion listes contacts
-# - Campagnes automatisées
-# - A/B testing
-# - Segmentation avancée
-```
-
-#### Réseaux Sociaux
-```bash
-# Facebook & Instagram
-FACEBOOK_APP_ID=your_facebook_app_id
-FACEBOOK_APP_SECRET=your_facebook_app_secret
-INSTAGRAM_ACCESS_TOKEN=your_instagram_token
-
-# LinkedIn
-LINKEDIN_CLIENT_ID=your_linkedin_client_id
-LINKEDIN_CLIENT_SECRET=your_linkedin_client_secret
-
-# Données récupérées :
-# - Posts et engagement
-# - Reach et impressions
-# - Données démographiques
-# - ROI publicitaire
-```
-
-#### Intelligence Artificielle
-```bash
-# OpenAI GPT-4
-OPENAI_API_KEY=sk-your_openai_api_key
-
-# Utilisations :
-# - Analyse de contenu
-# - Génération d'articles
-# - Recommandations marketing
-# - Optimisation SEO
-# - Réponses chatbot
+# ✅ Sécurité renforcée : credentials centralisés dans n8n
+# ✅ Flexibilité : ajout/suppression facile d'APIs
+# ✅ Maintenance simplifiée : configuration via interface
+# ✅ Séparation des responsabilités : site web vs automatisations
 ```
 
 ### 🔌 APIs Internes
@@ -729,12 +582,12 @@ sequenceDiagram
     U->>W: Visite page
     W->>S: Récupère contenu
     S->>N: Webhook content_viewed
-    N->>P: Stocke analytics
+    N->>P: Stocke données
     N->>M: Met à jour dashboard
     
     U->>S: Crée contenu
     S->>N: Webhook content_created
-    N->>P: Analyse SEO
+    N->>P: Traite données
     N->>W: Cache invalidation
 ```
 
@@ -756,7 +609,7 @@ cd strapi-automation-starter
 
 # 2. Copier et configurer l'environnement
 cp .env.example .env
-nano .env  # Éditer vos clés API
+nano .env  # Éditer les mots de passe et clés nécessaires
 
 # 3. Lancer tous les services
 docker-compose up -d
@@ -794,59 +647,113 @@ curl http://localhost:5050  # pgAdmin
 
 ## ⚙️ Configuration
 
-### 🔐 Configuration des APIs
+### 🔐 Variables d'Environnement Essentielles
 
-#### 1. Google Analytics Setup
+#### 1. Configuration .env Principale
+
+**Variables obligatoires (à modifier en production) :**
+```bash
+# =============================================================================
+# PostgreSQL - Base de données principale
+# =============================================================================
+POSTGRES_DB=automation_hub                              # Base de données principale
+POSTGRES_USER=admin_user                                # Utilisateur PostgreSQL
+POSTGRES_PASSWORD=your_super_secure_password_2024!      # ⚠️ À CHANGER en production
+
+# Bases spécialisées par service
+STRAPI_DB_NAME=strapi_cms                               # CMS Strapi
+NOCODB_DB_NAME=nocodb_app                               # Interface NocoDB
+N8N_DB_NAME=n8n_workflows                               # Workflows n8n
+METABASE_DB_NAME=metabase_analytics                     # Analytics Metabase
+SERPBEAR_DB_NAME=serpbear_seo                           # SEO SerpBear
+
+# =============================================================================
+# Strapi CMS - Clés de sécurité
+# =============================================================================
+STRAPI_APP_KEYS=NrXnjEMSjK5WRTKS2E1Rjg==,0oQaqHfIzUk14vAW7+G8/w==...
+STRAPI_JWT_SECRET=sUPfbO9brnOJ0r078Jw35A==            # ⚠️ À CHANGER
+STRAPI_ADMIN_JWT_SECRET=sUPfbO9brnOJ0r078Jw35A==       # ⚠️ À CHANGER
+STRAPI_API_TOKEN=your_strapi_api_token_for_nuxt_website # Pour connexion Nuxt
+
+# =============================================================================
+# Services - Sécurité et accès
+# =============================================================================
+# n8n Automation
+N8N_BASIC_AUTH_USER=admin                               # Login n8n
+N8N_BASIC_AUTH_PASSWORD=CHANGEZ_MOI_n8n_secure_password_2024!
+N8N_ENCRYPTION_KEY=CHANGEZ_MOI_n8n_encryption_key_very_long_and_secure_2024
+
+# NocoDB Interface
+NC_AUTH_JWT_SECRET=CHANGEZ_MOI_nocodb_jwt_secret_very_long_and_secure_2024
+
+# Metabase Analytics
+METABASE_ENCRYPTION_KEY=CHANGEZ_MOI_metabase_encryption_key_very_long_and_secure_2024
+
+# SerpBear SEO
+SERPBEAR_NEXTAUTH_SECRET=CHANGEZ_MOI_serpbear_nextauth_secret_very_long_and_secure_2024
+
+# pgAdmin
+PGADMIN_EMAIL=admin@votre-domaine.com                   # Email connexion pgAdmin
+PGADMIN_PASSWORD=admin_secure_password_2024!            # ⚠️ À CHANGER
+
+# =============================================================================
+# Analytics (Optionnel) - Site web uniquement
+# =============================================================================
+GOOGLE_ANALYTICS_PROPERTY_ID=123456789                  # GA4 Property ID
+```
+
+#### 2. Google Analytics Setup (Optionnel)
 
 ```bash
-# 1. Google Cloud Console
-# - Créer un projet
-# - Activer Google Analytics Data API
+# 1. Google Analytics 4
+# - Créer une propriété GA4 sur https://analytics.google.com
+# - Récupérer l'ID de propriété (ex: 123456789)
+# - Ajouter dans .env : GOOGLE_ANALYTICS_PROPERTY_ID=123456789
+
+# 2. Pour automatisations n8n avancées (optionnel)
+# - Google Cloud Console → APIs → Google Analytics Data API
 # - Créer des credentials OAuth2
-
-# 2. Configuration n8n
-# - Aller dans n8n → Credentials
-# - Ajouter "Google Analytics OAuth2 API"
-# - Copier Client ID/Secret depuis Google Cloud
-
-# 3. Variables .env
-GOOGLE_ANALYTICS_PROPERTY_ID=123456789
-GOOGLE_CLIENT_ID=your_id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your_secret
+# - Configurer dans n8n → Credentials → Google Analytics
 ```
 
-#### 2. Brevo Email Setup
+#### 3. Configuration des APIs tierces via n8n
 
+**🔑 Principe de séparation des responsabilités :**
+- ✅ **Site web** : Variables .env minimales (Strapi + Analytics)
+- ✅ **Automatisations** : APIs tierces configurées dans n8n
+- ✅ **Sécurité** : Credentials centralisés et chiffrés
+
+**APIs configurables dans n8n :**
 ```bash
-# 1. Compte Brevo (gratuit jusqu'à 300 emails/jour)
-# - S'inscrire sur https://app.brevo.com
-# - Aller dans Paramètres → Clés API
-# - Créer une nouvelle clé
+# Accéder à n8n : http://localhost:5678
+# → Credentials → Add Credential
 
-# 2. Configuration webhook
-# - Paramètres → Webhooks
-# - URL : http://your-domain:5678/webhook/brevo-webhook
-# - Événements : tous les événements email
-
-# 3. Variables .env
-BREVO_API_KEY=xkeysib-your_key
-BREVO_WEBHOOK_SECRET=your_secret
+# Exemples d'intégrations possibles :
+- OpenAI API (génération de contenu IA)
+- Brevo / SendinBlue (email marketing)
+- Google APIs (Drive, Sheets, Calendar)
+- Réseaux sociaux (Facebook, LinkedIn, Twitter)
+- CRM (HubSpot, Salesforce, Pipedrive)
+- E-commerce (Shopify, WooCommerce)
+- Et bien d'autres via les 400+ nodes n8n
 ```
 
-#### 3. OpenAI Setup
+#### 4. Configuration Strapi CMS
 
 ```bash
-# 1. Compte OpenAI
-# - S'inscrire sur https://platform.openai.com
-# - Aller dans API Keys
-# - Créer une nouvelle clé
+# 1. Premier accès
+# → http://localhost:1337/admin
+# → Créer compte administrateur
 
-# 2. Variables .env
-OPENAI_API_KEY=sk-your_openai_key
+# 2. Générer token API pour Nuxt
+# → Paramètres → API Tokens → Create new API Token
+# → Type : Read-only ou Full access
+# → Copier le token dans .env :
+STRAPI_API_TOKEN=votre_token_généré
 
-# 3. Créer le credential dans n8n
-# - Credentials → Add → OpenAI
-# - Coller la clé API
+# 3. Configuration des Content Types
+# → Content-Type Builder → Créer vos types de contenu
+# → Settings → Users & Permissions → Configurer accès public
 ```
 
 ### 🔧 Configuration Avancée
@@ -913,35 +820,34 @@ server {
 
 ### 📈 Dashboards Metabase
 
-#### 1. Marketing Dashboard Global
+#### 1. Dashboard Principal
 
-**Métriques clés affichées :**
-- 📊 **Trafic** : Sessions, utilisateurs, pages vues (7/30 jours)
-- 🔍 **SEO** : Positions moyennes, mots-clés top 3, évolutions
-- 📧 **Email** : Taux d'ouverture, clics, conversions
-- 💰 **ROI** : Revenus par canal, coût d'acquisition
-- 🎯 **Objectifs** : Progression vers les KPIs définis
+**Métriques affichées selon vos besoins :**
+- 📊 **Trafic** : Sessions, utilisateurs, pages vues
+- 🔍 **SEO** : Positions des mots-clés, évolutions
+- 📈 **Performance** : Métriques personnalisées
+- 💾 **Données** : Collectées via vos workflows n8n
+- 🎯 **Objectifs** : KPIs définis selon votre activité
 
 **Requêtes SQL exemple :**
 ```sql
--- Evolution du trafic sur 30 jours
+-- Evolution du trafic (si Google Analytics configuré)
 SELECT 
   date_collected,
   SUM(sessions) as total_sessions,
-  SUM(users) as total_users,
-  AVG(bounce_rate) as avg_bounce_rate
-FROM marketing_ops.google_analytics_data 
-WHERE date_collected >= CURRENT_DATE - INTERVAL '30 days'
+  SUM(users) as total_users
+FROM workflow_results 
+WHERE workflow_name = 'google_analytics_data'
+  AND execution_date >= CURRENT_DATE - INTERVAL '30 days'
 GROUP BY date_collected
 ORDER BY date_collected;
 
--- Top 10 mots-clés performers
+-- Top mots-clés SEO (depuis SerpBear)
 SELECT 
   keyword,
   AVG(position) as avg_position,
-  COUNT(*) as tracking_days,
-  AVG(change_from_previous) as avg_change
-FROM marketing_ops.serpbear_rankings 
+  COUNT(*) as tracking_days
+FROM serpbear_rankings 
 WHERE date_collected >= CURRENT_DATE - INTERVAL '30 days'
   AND position <= 10
 GROUP BY keyword
@@ -949,29 +855,29 @@ ORDER BY avg_position ASC
 LIMIT 10;
 ```
 
-#### 2. SEO Performance Dashboard
+#### 2. Dashboard SEO
 
 **Widgets spécialisés :**
-- 🎯 **Mots-clés gagnants** (progressions >5 positions)
-- ⚠️ **Alertes SEO** (chutes >3 positions)
+- 🎯 **Mots-clés performants** (progressions)
+- ⚠️ **Alertes SEO** (chutes de positions)
 - 📊 **Distribution positions** (top 3, 4-10, 11-20, etc.)
-- 🔍 **Opportunités** (mots-clés 11-20 à pousser)
+- 🔍 **Opportunités** (mots-clés à améliorer)
 - 📈 **Corrélations** trafic/positions
 
-#### 3. Email Marketing Analytics
+#### 3. Dashboard Données Personnalisées
 
-**Métriques avancées :**
-- 📧 **Funnel conversion** (envoyé → ouvert → cliqué → converti)
-- 🎯 **Segmentation performance** par audience
-- ⏰ **Optimisation horaires** d'envoi
-- 📱 **Performance par device**
-- 🔄 **A/B testing** résultats
+**Métriques selon vos workflows :**
+- 📧 **Données email** (si configuré via n8n)
+- 🎯 **Conversions** et objectifs métier
+- ⏰ **Performance temporelle** des actions
+- 📱 **Données multi-sources** agrégées
+- 🔄 **Suivi des automatisations**
 
-#### 4. AI Content Performance
+#### 4. Dashboard Techniques
 
-**Suivi des recommandations IA :**
-- 💡 **Idées de contenu** générées et utilisées
-- 📊 **Score de confiance** vs performance réelle
+**Suivi des workflows et système :**
+- 💡 **Exécutions n8n** et statuts
+- 📊 **Performance base de données**
 - 🎯 **ROI des suggestions** implémentées
 - 🔄 **Amélioration continue** du modèle IA
 
@@ -979,411 +885,196 @@ LIMIT 10;
 
 #### Rapport Hebdomadaire PDF
 
-```sql
--- Génération automatique chaque lundi
-WITH weekly_stats AS (
-  SELECT 
-    'Traffic' as metric,
-    SUM(sessions) as current_week,
-    LAG(SUM(sessions)) OVER () as previous_week
-  FROM google_analytics_data 
-  WHERE date_collected >= CURRENT_DATE - INTERVAL '7 days'
-  
-  UNION ALL
-  
-  SELECT 
-    'SEO_Avg_Position' as metric,
-    AVG(position) as current_week,
-    (SELECT AVG(position) FROM serpbear_rankings 
-     WHERE date_collected >= CURRENT_DATE - INTERVAL '14 days'
-     AND date_collected < CURRENT_DATE - INTERVAL '7 days') as previous_week
-  FROM serpbear_rankings 
-  WHERE date_collected >= CURRENT_DATE - INTERVAL '7 days'
-)
-SELECT * FROM weekly_stats;
-```
+- 🛡️ **Monitoring système** et alertes
+- 💾 **Sauvegarde** automatique des données
 
-#### Alertes Automatiques
+## 🤖 Intelligence Artificielle (Configurable)
 
-**Conditions déclenchement :**
-- 🚨 **Trafic** : Baisse >20% par rapport à la semaine précédente
-- 🔍 **SEO** : >5 mots-clés perdent >5 positions
-- 📧 **Email** : Taux d'ouverture <15% sur 3 campagnes consécutives
-- 🛡️ **Monitoring** : Service indisponible >5 minutes
+### 🧠 Intégrations IA via n8n
 
-## 🤖 Intelligence Artificielle
+L'intelligence artificielle est entièrement configurable via n8n selon vos besoins spécifiques.
 
-### 🧠 Modèles IA Intégrés
+**Exemples d'utilisation possibles :**
+- 🤖 **Génération de contenu** avec OpenAI
+- 📊 **Analyse de données** personnalisée
+- 🔍 **Optimisation SEO** automatique
+- 📧 **Personnalisation emails** selon les profils
+- 📱 **Suggestions de contenu** pour réseaux sociaux
 
-#### GPT-4 pour l'Analyse Marketing
-
-**Prompt Engineering avancé :**
+**Configuration :**
 ```javascript
-const marketingPrompt = `
-Analyse marketing hebdomadaire pour ${domain}:
-
-DONNÉES ANALYTICS (7 derniers jours):
-${analyticsData.map(d => 
-  `- ${d.traffic_source}: ${d.avg_sessions} sessions, ${d.avg_bounce_rate}% bounce rate`
-).join('\n')}
-
-PERFORMANCES SEO (top keywords):
-${seoData.map(d => 
-  `- "${d.keyword}": position ${d.avg_position} ${d.change_from_previous > 0 ? '📈' : '📉'} ${Math.abs(d.change_from_previous)}`
-).join('\n')}
-
-RÉSEAUX SOCIAUX:
-${socialData.map(d => 
-  `- ${d.platform}: ${d.avg_engagement}% engagement, ${d.total_interactions} interactions`
-).join('\n')}
-
-MISSION:
-1. Génère 3 recommandations SMART d'amélioration
-2. Propose 5 idées de contenu basées sur les données
-3. Identifie 2 opportunités SEO prioritaires
-4. Suggère 1 optimisation technique
-
-FORMAT: JSON avec {recommendations: [], content_ideas: [], seo_opportunities: [], technical_optimization: ""}
-`;
-```
-
-#### Algorithmes de Scoring
-
-**Score de Performance Marketing :**
-```javascript
-function calculateMarketingScore(data) {
-  const weights = {
-    traffic_growth: 0.3,
-    seo_positions: 0.25,
-    email_engagement: 0.2,
-    social_engagement: 0.15,
-    conversion_rate: 0.1
-  };
-  
-  // Calcul composite avec IA
-  const score = Object.entries(weights).reduce((total, [metric, weight]) => {
-    return total + (normalizeMetric(data[metric]) * weight);
-  }, 0);
-  
-  return Math.round(score * 100);
-}
-```
-
-### 🎯 Use Cases IA Avancés
-
-#### 1. Génération de Contenu Automatique
-
-```mermaid
-graph LR
-    A[Analytics Data] --> B[IA Analysis]
-    C[SEO Data] --> B
-    D[Social Data] --> B
-    B --> E[Content Ideas]
-    B --> F[SEO Optimizations]
-    B --> G[Marketing Recommendations]
-    E --> H[Strapi CMS]
-    F --> I[SerpBear Keywords]
-    G --> J[Email Campaigns]
-```
-
-**Types de contenu générés :**
-- 📝 **Articles de blog** optimisés SEO
-- 📧 **Newsletters** personnalisées
-- 📱 **Posts réseaux sociaux** avec hashtags
-- 🎯 **Meta descriptions** et titles
-- 📋 **Landing pages** pour campagnes
-
-#### 2. Optimisation SEO Intelligente
-
-**Analyse sémantique avancée :**
-```python
-# Pseudo-code de l'algorithme IA SEO
-def optimize_content_for_seo(content, target_keywords, competitor_data):
-    # Analyse sémantique du contenu
-    semantic_analysis = analyze_content_semantics(content)
-    
-    # Identification des opportunités
-    opportunities = find_semantic_gaps(semantic_analysis, competitor_data)
-    
-    # Génération de suggestions
-    suggestions = generate_seo_improvements(opportunities, target_keywords)
-    
-    return {
-        'keyword_density': optimize_keyword_density(content, target_keywords),
-        'semantic_keywords': suggest_semantic_keywords(opportunities),
-        'content_structure': optimize_headings_structure(content),
-        'internal_links': suggest_internal_links(content, existing_content)
+// Exemple de workflow n8n avec OpenAI
+{
+  "nodes": [
+    {
+      "name": "Trigger",
+      "type": "n8n-nodes-base.webhook"
+    },
+    {
+      "name": "OpenAI",
+      "type": "n8n-nodes-base.openAi",
+      "credentials": "openAiApi"
+    },
+    {
+      "name": "Save to Database",
+      "type": "n8n-nodes-base.postgres"
     }
-```
-
-#### 3. Prédiction de Performance
-
-**Machine Learning pour Marketing :**
-- 📈 **Prédiction trafic** basée sur saisonnalité + tendances
-- 🎯 **Scoring leads** automatique avec probabilité conversion
-- 📧 **Optimisation send time** email par utilisateur
-- 🔍 **Prédiction positions SEO** après optimisations
-
-### 🔧 Configuration IA Avancée
-
-#### Fine-tuning des Modèles
-
-```yaml
-# config/ai-models.yml
-openai:
-  model: "gpt-4"
-  max_tokens: 2000
-  temperature: 0.7
-  top_p: 0.9
-  frequency_penalty: 0.1
-  presence_penalty: 0.1
-
-content_generation:
-  tone: "professionnel mais accessible"
-  language: "français"
-  style: "informatif et engageant"
-  target_audience: "décideurs entreprise"
-
-seo_optimization:
-  keyword_density_target: 1.5  # %
-  semantic_keywords_count: 10
-  readability_score_min: 60
-  content_length_min: 800
-```
-
-#### Intégration Vertex AI (Google)
-
-```javascript
-// Configuration alternative Google Vertex AI
-const vertexAI = {
-  project_id: process.env.GOOGLE_VERTEX_AI_PROJECT_ID,
-  location: process.env.GOOGLE_VERTEX_AI_LOCATION,
-  model: "text-bison@001",
-  
-  // Prompt pour analyse marketing en français
-  generateInsights: async (marketingData) => {
-    const prompt = `Analyse ces données marketing et donne des recommandations en français: ${JSON.stringify(marketingData)}`;
-    return await vertexAI.predict(prompt);
-  }
-};
-```
-
-## 📈 SEO et Marketing
-
-### 🔍 Stratégie SEO Automatisée
-
-#### Workflow SEO Complet
-
-```mermaid
-graph TD
-    A[SerpBear Tracking] --> B[Position Analysis]
-    B --> C{Position Change?}
-    C -->|Gain| D[Success Analysis]
-    C -->|Loss| E[Problem Diagnosis]
-    C -->|Stable| F[Opportunity Search]
-    
-    D --> G[Replicate Success]
-    E --> H[Corrective Actions]
-    F --> I[Content Optimization]
-    
-    G --> J[IA Content Generation]
-    H --> J
-    I --> J
-    
-    J --> K[Strapi CMS Update]
-    K --> L[Website Deployment]
-    L --> A
-```
-
-#### Métriques SEO Avancées
-
-**KPIs trackés automatiquement :**
-- 🎯 **Visibilité organique** (positions pondérées par volume)
-- 📊 **Share of Voice** par rapport à la concurrence
-- 🔍 **Capture de featured snippets**
-- 📱 **Performance mobile vs desktop**
-- 🌍 **Positionnement géolocalisé**
-- ⚡ **Core Web Vitals** et PageSpeed
-
-**Calcul de la visibilité organique :**
-```sql
--- Calcul automatique de la visibilité SEO
-WITH visibility_calc AS (
-  SELECT 
-    keyword,
-    position,
-    search_volume,
-    CASE 
-      WHEN position = 1 THEN 0.315
-      WHEN position = 2 THEN 0.158
-      WHEN position = 3 THEN 0.100
-      WHEN position <= 10 THEN 0.05 * (11 - position) / 10
-      ELSE 0
-    END as ctr_estimated,
-    search_volume * (CASE 
-      WHEN position = 1 THEN 0.315
-      WHEN position = 2 THEN 0.158
-      WHEN position = 3 THEN 0.100
-      WHEN position <= 10 THEN 0.05 * (11 - position) / 10
-      ELSE 0
-    END) as estimated_traffic
-  FROM marketing_ops.serpbear_rankings 
-  WHERE date_collected = CURRENT_DATE
-)
-SELECT 
-  SUM(estimated_traffic) as total_estimated_traffic,
-  AVG(position) as avg_position,
-  COUNT(*) as total_keywords
-FROM visibility_calc;
-```
-
-### 📧 Email Marketing Automation
-
-#### Segmentation Intelligente
-
-**Algorithme de scoring utilisateurs :**
-```javascript
-function calculateUserScore(user_data) {
-  const engagement_score = (
-    user_data.email_opens * 2 +
-    user_data.email_clicks * 5 +
-    user_data.page_views * 1 +
-    user_data.time_on_site / 60 * 0.5
-  );
-  
-  const recency_score = Math.max(0, 100 - (
-    (Date.now() - user_data.last_activity) / (1000 * 60 * 60 * 24)
-  ));
-  
-  return {
-    engagement: Math.min(100, engagement_score),
-    recency: recency_score,
-    combined: (engagement_score + recency_score) / 2
-  };
+  ]
 }
 ```
 
-#### Campagnes Automatisées
+**Avantages de cette approche :**
+- ✅ **Flexibilité maximale** : configurez uniquement ce dont vous avez besoin
+- ✅ **Évolutivité** : ajoutez des fonctionnalités IA au fur et à mesure
+- ✅ **Coûts maîtrisés** : payez uniquement les APIs que vous utilisez
+- ✅ **Sécurité** : credentials centralisés dans n8n
 
-**Types de campagnes n8n :**
+## 📈 SEO et Analytics
 
-1. **🎯 Welcome Series**
-   ```json
-   {
-     "trigger": "user_registration",
-     "sequence": [
-       {"delay": "1 hour", "template": "welcome_email"},
-       {"delay": "3 days", "template": "getting_started"},
-       {"delay": "7 days", "template": "advanced_features"},
-       {"delay": "14 days", "template": "success_stories"}
-     ]
-   }
-   ```
+### 🤖 SEO Moderne et Référencement IA
 
-2. **🔄 Re-engagement Campaign**
-   ```json
-   {
-     "trigger": "inactive_30_days",
-     "condition": "email_opens < 5 AND page_views < 10",
-     "action": "send_reengagement_series"
-   }
-   ```
+#### JSON-LD et Données Structurées
 
-3. **🎉 Behavior-based Triggers**
-   ```json
-   {
-     "triggers": [
-       {"event": "downloaded_resource", "action": "send_related_content"},
-       {"event": "abandoned_cart", "action": "send_reminder_24h"},
-       {"event": "high_engagement", "action": "send_premium_offer"}
-     ]
-   }
-   ```
+**🧠 Optimisation pour l'intelligence artificielle :**
+Le package `nuxt-jsonld` permet d'intégrer automatiquement des **données structurées Schema.org** optimisées pour les moteurs de recherche et l'IA (ChatGPT, Bard, etc.).
 
-### 📱 Social Media Integration
-
-#### Automation Multi-Plateformes
-
-**Workflow publication automatique :**
-```mermaid
-graph LR
-    A[IA Content Created] --> B[Platform Adaptation]
-    B --> C[Facebook Post]
-    B --> D[Instagram Story]
-    B --> E[LinkedIn Article]
-    B --> F[Twitter Thread]
-    
-    C --> G[Schedule Optimal Time]
-    D --> G
-    E --> G
-    F --> G
-    
-    G --> H[Performance Tracking]
-    H --> I[Optimization ML]
+```typescript
+// Exemple d'implémentation JSON-LD pour une organisation
+export default defineNuxtPlugin(() => {
+  useJsonld(() => ({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Votre Entreprise',
+    url: 'https://votre-site.com',
+    logo: 'https://votre-site.com/logo.png',
+    description: 'Description claire et concise pour les IA',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: '123 Rue Example',
+      addressLocality: 'Paris',
+      postalCode: '75001',
+      addressCountry: 'FR'
+    },
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: '+33-1-23-45-67-89',
+      contactType: 'Service client'
+    },
+    sameAs: [
+      'https://www.linkedin.com/company/votre-entreprise',
+      'https://twitter.com/votre_entreprise'
+    ]
+  }))
+})
 ```
 
-**Optimisation par plateforme :**
-```javascript
-const platformOptimization = {
-  facebook: {
-    max_length: 2000,
-    optimal_time: "15:00-17:00",
-    hashtags_max: 3,
-    image_ratio: "1200x630"
+**🔍 Types de contenus structurés supportés :**
+- 🏢 **Organization** : Informations entreprise
+- 📄 **Article** : Articles de blog SEO-optimisés
+- 🛒 **Product** : Fiches produits e-commerce
+- 👤 **Person** : Profils équipe et dirigeants
+- 📍 **LocalBusiness** : Entreprises locales
+- ❓ **FAQPage** : Pages de questions-réponses
+- 🍞 **BreadcrumbList** : Navigation structurée
+
+#### Performance et Core Web Vitals
+
+**⚡ Optimisations automatiques intégrées :**
+```typescript
+// nuxt.config.ts - Configuration performance
+export default defineNuxtConfig({
+  nitro: {
+    compressPublicAssets: true,           // Compression Gzip/Brotli
+    prerender: {
+      crawlLinks: true                    // Pré-rendu intelligent
+    }
   },
-  instagram: {
-    max_length: 150,
-    optimal_time: "11:00-14:00",
-    hashtags_max: 30,
-    image_ratio: "1080x1080"
+  image: {
+    format: ['webp', 'avif'],            // Formats modernes
+    quality: 80,                         // Optimisation qualité/poids
+    densities: [1, 2],                   // Support écrans haute résolution
   },
-  linkedin: {
-    max_length: 3000,
-    optimal_time: "08:00-10:00",
-    hashtags_max: 5,
-    image_ratio: "1200x627"
+  fonts: {
+    families: [
+      { name: 'Inter', provider: 'google' } // Police optimisée Google Fonts
+    ]
   }
-};
+})
 ```
 
-### 💰 ROI Tracking et Attribution
+**📊 Métriques Core Web Vitals surveillées :**
+- **LCP (Largest Contentful Paint)** : < 2.5s
+- **FID (First Input Delay)** : < 100ms  
+- **CLS (Cumulative Layout Shift)** : < 0.1
+- **TTFB (Time to First Byte)** : < 600ms
 
-#### Modèle d'Attribution Multi-Touch
+#### SEO Technique Automatisé
 
+**🔧 Fonctionnalités SEO intégrées :**
+```typescript
+// Génération automatique des meta-tags
+export default defineNuxtConfig({
+  app: {
+    head: {
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'robots', content: 'index, follow' },
+        { name: 'googlebot', content: 'index, follow' }
+      ]
+    }
+  },
+  sitemap: {
+    hostname: 'https://votre-site.com',
+    gzip: true,
+    exclude: ['/admin/**', '/api/**']
+  }
+})
+```
+
+**📋 Optimisations automatiques :**
+- 🗺️ **Sitemap XML** généré automatiquement
+- 🤖 **Robots.txt** configuré pour les crawlers
+- 📱 **Meta viewport** responsive
+- 🔗 **Canonical URLs** pour éviter le contenu dupliqué
+- 🏷️ **Meta descriptions** dynamiques depuis Strapi
+- 🖼️ **Open Graph** et **Twitter Cards** automatiques
+- 📊 **Google Analytics 4** avec événements avancés
+
+### 🔍 Suivi SEO avec SerpBear
+
+**Fonctionnalités principales :**
+- 🎯 **Suivi de mots-clés** illimité
+- 🌍 **Géolocalisation** des recherches
+- 📱 **Desktop & Mobile** séparément
+- 📊 **Historique** des positions
+- ⚠️ **Alertes** automatiques
+- 🔄 **API REST** pour intégrations n8n
+
+**Métriques SEO de base :**
 ```sql
--- Attribution marketing multi-canal
-WITH customer_journey AS (
-  SELECT 
-    user_id,
-    channel,
-    touchpoint_value,
-    conversion_value,
-    LAG(channel) OVER (PARTITION BY user_id ORDER BY timestamp) as previous_channel,
-    LEAD(channel) OVER (PARTITION BY user_id ORDER BY timestamp) as next_channel
-  FROM marketing_ops.customer_touchpoints
-  WHERE timestamp >= CURRENT_DATE - INTERVAL '30 days'
-),
-attribution_weights AS (
-  SELECT 
-    user_id,
-    channel,
-    CASE 
-      WHEN previous_channel IS NULL THEN 0.4  -- First touch
-      WHEN next_channel IS NULL THEN 0.4      -- Last touch
-      ELSE 0.2 / COUNT(*) OVER (PARTITION BY user_id)  -- Middle touches
-    END as attribution_weight,
-    conversion_value
-  FROM customer_journey
-)
+-- Évolution des positions (exemple)
 SELECT 
-  channel,
-  SUM(attribution_weight * conversion_value) as attributed_revenue,
-  COUNT(DISTINCT user_id) as unique_users,
-  SUM(attributed_revenue) / SUM(marketing_cost) as roi
-FROM attribution_weights
-GROUP BY channel
-ORDER BY attributed_revenue DESC;
+  keyword,
+  AVG(position) as avg_position,
+  COUNT(*) as tracking_days
+FROM serpbear_rankings 
+WHERE date_collected >= CURRENT_DATE - INTERVAL '30 days'
+GROUP BY keyword
+ORDER BY avg_position ASC;
 ```
+
+### 📊 Analytics Personnalisés
+
+**Collecte de données via n8n :**
+- 📈 **Google Analytics** (si configuré)
+- 🔍 **SerpBear** (positions SEO)
+- 📧 **Email metrics** (si service email configuré)
+- 🛡️ **Monitoring** serveur et uptime
+- 📊 **Métriques métier** spécifiques
+
+**Configuration flexible :**
+Toutes les sources de données sont configurables dans n8n selon vos besoins et votre budget.
 
 ## 🛡️ Sécurité et Monitoring
 
@@ -1391,7 +1082,7 @@ ORDER BY attributed_revenue DESC;
 
 #### Configuration Sécurisée
 
-**Variables sensibles (.env) :**
+**Variables essentielles (.env) :**
 ```bash
 # OBLIGATOIRE : Changez ces valeurs en production !
 POSTGRES_PASSWORD=your_super_secure_password_2024!
@@ -1399,32 +1090,34 @@ STRAPI_JWT_SECRET=$(openssl rand -base64 32)
 STRAPI_ADMIN_JWT_SECRET=$(openssl rand -base64 32)
 N8N_ENCRYPTION_KEY=$(openssl rand -base64 32)
 METABASE_ENCRYPTION_KEY=$(openssl rand -base64 32)
+SESSION_SECRET=$(openssl rand -base64 32)
 
-# Clés API (ne jamais commiter)
-OPENAI_API_KEY=sk-your_secret_key
-BREVO_API_KEY=xkeysib-your_secret_key
-GOOGLE_CLIENT_SECRET=your_secret
+# Google Analytics (optionnel)
+GOOGLE_ANALYTICS_PROPERTY_ID=your_property_id
+
+# IMPORTANT : Toutes les autres APIs (OpenAI, Brevo, etc.) 
+# sont à configurer dans n8n, pas dans .env
 ```
 
 **Permissions PostgreSQL :**
 ```sql
 -- Utilisateur lecture seule pour Metabase
 CREATE USER metabase_reader WITH PASSWORD 'secure_password';
-GRANT CONNECT ON DATABASE automation_hub TO metabase_reader;
-GRANT USAGE ON SCHEMA marketing_ops TO metabase_reader;
-GRANT SELECT ON ALL TABLES IN SCHEMA marketing_ops TO metabase_reader;
+GRANT CONNECT ON DATABASE metabase_analytics TO metabase_reader;
+GRANT USAGE ON SCHEMA public TO metabase_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO metabase_reader;
 
 -- Utilisateur limité pour NocoDB
 CREATE USER nocodb_user WITH PASSWORD 'secure_password';
-GRANT CONNECT ON DATABASE automation_hub TO nocodb_user;
+GRANT CONNECT ON DATABASE nocodb_app TO nocodb_user;
 GRANT USAGE, CREATE ON SCHEMA public TO nocodb_user;
 ```
 
 #### Protection des APIs
 
-**Rate limiting n8n :**
+**Sécurité n8n :**
 ```javascript
-// Middleware rate limiting dans les workflows
+// Rate limiting dans les workflows
 const rateLimiter = {
   requests_per_minute: 60,
   requests_per_hour: 1000,
@@ -1933,41 +1626,52 @@ git push origin feature/docs-improvement
 
 ## 🎯 Conclusion
 
-Cette plateforme Strapi Automation Starter représente un **écosystème marketing complet** qui transforme la façon dont les entreprises gèrent leur présence numérique. En combinant CMS headless, intelligence artificielle, analytics avancés et workflows automatisés, elle offre :
+Cette plateforme **Strapi Automation Starter** représente un **écosystème de site web d'entreprise moderne** qui combine les meilleures technologies actuelles pour créer des sites performants et évolutifs. En associant Nuxt 3, Strapi CMS, et des outils d'automatisation, elle offre :
 
 ### ✨ Avantages Clés
 
-- 🚀 **Déploiement rapide** : Site opérationnel en 5 minutes
-- 🤖 **Automation intelligente** : 80% des tâches marketing automatisées
-- 📊 **Analytics centralisés** : Vue 360° de la performance
-- 🔗 **Intégrations natives** : 15+ services connectés
-- 💰 **ROI mesurable** : Tracking complet des conversions
-- 🛡️ **Sécurité enterprise** : Backup, monitoring, alertes
+- 🚀 **Déploiement instantané** : Site opérationnel en 5 minutes
+- 🤖 **SEO optimisé pour l'IA** : JSON-LD et données structurées
+- 📊 **Analytics centralisés** : Google Analytics 4 + Metabase
+- 🎨 **UX moderne** : Animations GSAP + TailwindCSS 4
+- 🔗 **Intégrations flexibles** : n8n pour toutes les APIs tierces
+- 🛡️ **Sécurité renforcée** : Variables d'environnement séparées
+- ⚡ **Performances optimales** : SSR/SSG + compression automatique
+
+### 🎯 Technologies de Pointe Intégrées
+
+- **Nuxt 3.17.5** avec TypeScript pour un développement moderne
+- **JSON-LD automatique** pour le référencement IA (ChatGPT, Bard)
+- **GSAP** pour des animations fluides et engageantes
+- **TailwindCSS 4** avec système de design modulaire
+- **Google Analytics 4** avec tracking avancé
+- **Core Web Vitals** optimisés pour les performances
+- **Strapi CMS** headless pour la gestion de contenu flexible
 
 ### 🚀 Prochaines Étapes
 
-1. **Installation** : Suivez le guide d'installation rapide
-2. **Configuration** : Ajoutez vos clés API dans `.env`
-3. **Personnalisation** : Adaptez les workflows à vos besoins
-4. **Formation** : Explorez les interfaces et dashboards
-5. **Optimisation** : Utilisez les suggestions IA pour améliorer
+1. **Installation** : `docker-compose up -d` et c'est parti !
+2. **Configuration** : Modifier les variables .env selon vos besoins
+3. **Personnalisation** : Créer vos Content Types dans Strapi
+4. **Intégrations** : Configurer vos APIs dans n8n
+5. **Optimisation** : Analyser les performances avec Metabase
 
 ### 🌟 Évolutions Futures
 
-- 🤖 **IA avancée** : GPT-5, analyse vidéo, voice search
-- 📱 **Mobile-first** : Progressive Web App native
-- 🌍 **Multi-tenant** : Gestion de plusieurs sites
-- 🔗 **Marketplace** : Plugins et workflows communautaires
-- ☁️ **Cloud native** : Déploiement Kubernetes
+- 🤖 **IA conversationnelle** : Chatbots intégrés
+- 📱 **PWA avancée** : Mode offline et notifications push  
+- 🌍 **Multi-langue** : i18n automatique avec Strapi
+- 🔗 **Marketplace n8n** : Workflows communautaires
+- ☁️ **Cloud-native** : Déploiement Kubernetes simplifié
 
 ---
 
 **⭐ Si ce projet vous aide, n'hésitez pas à le partager et contribuer !**
 
-📧 **Questions ?** Contactez-nous : support@votre-domaine.com
-🐛 **Bug trouvé ?** Ouvrez une issue : [GitHub Issues](https://github.com/your-repo/issues)
+📧 **Questions ?** Contactez-nous : support@votre-domaine.com  
+🐛 **Bug trouvé ?** Ouvrez une issue : [GitHub Issues](https://github.com/your-repo/issues)  
 💡 **Idée d'amélioration ?** Rejoignez les discussions : [GitHub Discussions](https://github.com/your-repo/discussions)
 
 ---
 
-*Développé avec ❤️ pour automatiser le marketing digital*
+*Développé avec ❤️ pour créer des sites web d'entreprise modernes et performants par lugh web https://lugh-web.fr*

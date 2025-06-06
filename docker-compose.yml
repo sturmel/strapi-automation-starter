@@ -215,56 +215,11 @@ services:
       
       # Configuration API URLs
       STRAPI_URL: http://strapi:1337
-      API_BASE_URL: http://localhost:1337
-      
-      # Configuration domaines
-      DOMAIN_WEBSITE: ${DOMAIN_WEBSITE}
-      DOMAIN_STRAPI: ${DOMAIN_STRAPI}
-      DOMAIN_NOCODB: ${DOMAIN_NOCODB}
-      DOMAIN_N8N: ${DOMAIN_N8N}
-      DOMAIN_METABASE: ${DOMAIN_METABASE}
-      DOMAIN_SERPBEAR: ${DOMAIN_SERPBEAR}
-      DOMAIN_PGADMIN: ${DOMAIN_PGADMIN}
-      
-      # Configuration timezone
-      TZ: ${TIMEZONE}
-      TIMEZONE: ${TIMEZONE}
-      
-      # Base de données PostgreSQL
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      
-      # Configuration Strapi
       STRAPI_API_TOKEN: ${STRAPI_API_TOKEN:-}
       
-      # Google APIs
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      # Google Analytics
       GOOGLE_TAG: ${GOOGLE_ANALYTICS_PROPERTY_ID}
       GOOGLE_ANALYTICS_PROPERTY_ID: ${GOOGLE_ANALYTICS_PROPERTY_ID}
-      GOOGLE_ADS_CUSTOMER_ID: ${GOOGLE_ADS_CUSTOMER_ID}
-      
-      # Brevo (ex-Sendinblue)
-      BREVO_API_KEY: ${BREVO_API_KEY}
-      BREVO_WEBHOOK_SECRET: ${BREVO_WEBHOOK_SECRET}
-      
-      # Réseaux Sociaux
-      FACEBOOK_APP_ID: ${FACEBOOK_APP_ID}
-      FACEBOOK_APP_SECRET: ${FACEBOOK_APP_SECRET}
-      INSTAGRAM_ACCESS_TOKEN: ${INSTAGRAM_ACCESS_TOKEN}
-      LINKEDIN_CLIENT_ID: ${LINKEDIN_CLIENT_ID}
-      LINKEDIN_CLIENT_SECRET: ${LINKEDIN_CLIENT_SECRET}
-      
-      # IA et APIs
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      GOOGLE_VERTEX_AI_PROJECT_ID: ${GOOGLE_VERTEX_AI_PROJECT_ID}
-      GOOGLE_VERTEX_AI_LOCATION: ${GOOGLE_VERTEX_AI_LOCATION}
-      
-      # SerpBear
-      SERPBEAR_API_KEY: ${SERPBEAR_API_KEY}
       
       # Configuration de session
       SESSION_SECRET: ${SESSION_SECRET:-nuxt-session-secret-key-change-in-production}
