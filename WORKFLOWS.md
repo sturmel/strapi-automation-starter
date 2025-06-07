@@ -1,308 +1,396 @@
-# 🔄 Guide des Workflows n8n
+# 🔄 Documentation des Workflows n8n
 
-Ce document détaille tous les workflows automatisés inclus dans le Marketing Automation Hub.
+## 📋 Vue d'ensemble
 
-## 📋 Workflows Inclus
+Cette plateforme utilise **n8n** pour automatiser la collecte de données marketing et le monitoring des services. Chaque workflow est conçu pour être autonome et contribuer à l'écosystème global d'analytics et de surveillance.
 
-### 1. **Brevo Email Events** (`brevo-email-events.json`)
+## 🎯 Philosophie des Workflows
 
-**Objectif** : Capturer en temps réel tous les événements emails depuis Brevo
-
-**Déclencheur** : Webhook HTTP (`/webhook/brevo-webhook`)
-
-**Actions** :
-- Réception des événements Brevo (delivered, opened, clicked, bounced, etc.)
-- Formatage et nettoyage des données
-- Stockage dans `marketing_ops.brevo_email_events`
-
-**Configuration requise** :
-```bash
-# Dans Brevo, configurez le webhook vers :
-URL: http://votre-domaine.com:5678/webhook/brevo-webhook
-Events: delivered, opened, clicked, bounced, unsubscribed, spam, invalid
-```
-
-**Structure des données stockées** :
-- `event_type` : Type d'événement (delivered, opened, etc.)
-- `email` : Email du destinataire
-- `campaign_id` : ID de la campagne
-- `event_date` : Date/heure de l'événement
-- `tags` : Métadonnées supplémentaires (JSON)
+- **🔄 Automatisation complète** : Collecte automatique des données sans intervention manuelle
+- **📊 Centralisation** : Toutes les données convergent vers PostgreSQL
+- **⚡ Temps réel** : Monitoring continu et alertes instantanées
+- **🧠 Intelligence** : Analyse IA des données pour des insights actionnables
+- **🔗 Intégration** : Connexion fluide entre tous les services
 
 ---
 
-### 2. **Google Analytics Daily** (`google-analytics-daily.json`)
+## 📊 Workflows Existants
 
-**Objectif** : Collecte quotidienne des données Google Analytics 4
+### 1. 📈 Google Analytics Daily (`google-analytics-daily.json`)
 
-**Déclencheur** : Cron (tous les jours à 3h du matin)
+**🎯 Objectif :** Collecte quotidienne des données Google Analytics pour alimenter les rapports de performance.
 
-**Actions** :
-- Récupération des métriques GA4 (sessions, utilisateurs, pages vues)
-- Segmentation par source de trafic, device, pays
-- Stockage dans `marketing_ops.google_analytics_data`
+**⏰ Fréquence :** Tous les jours à 3h du matin
 
-**Métriques collectées** :
+**🔗 Services connectés :**
+- Google Analytics API
+- PostgreSQL (`marketing_ops.google_analytics_data`)
+
+**📋 Données collectées :**
 - Sessions, utilisateurs, nouveaux utilisateurs
 - Pages vues, taux de rebond
 - Durée moyenne des sessions
-- Objectifs et conversions
+- Sources de trafic et catégories d'appareils
+- Données géographiques (pays)
 
-**Configuration requise** :
-1. Activer l'API Google Analytics dans Google Cloud Console
-2. Créer des credentials OAuth2
-3. Configurer la variable `GOOGLE_ANALYTICS_PROPERTY_ID`
-
----
-
-### 3. **AI Content Analysis** (`ai-content-analysis.json`)
-
-**Objectif** : Analyse hebdomadaire des performances et génération de recommandations IA
-
-**Déclencheur** : Cron (tous les lundis à 9h)
-
-**Actions** :
-1. Récupération des données des 7 derniers jours (Analytics, SEO, Social)
-2. Compilation d'un rapport de performance
-3. Envoi à OpenAI GPT-4 pour analyse
-4. Génération de recommandations et idées de contenu
-5. Stockage dans `marketing_ops.ai_content_suggestions`
-
-**Types de suggestions générées** :
-- Recommandations d'optimisation
-- Idées de contenu basées sur les données
-- Analyses de tendances
-- Suggestions d'amélioration SEO
-
----
-
-### 4. **SerpBear Rankings** (`serpbear-rankings.json`)
-
-**Objectif** : Collecte quotidienne des positions SEO depuis SerpBear
-
-**Déclencheur** : Cron (tous les jours à 5h du matin)
-
-**Actions** :
-- Récupération des positions via l'API SerpBear
-- Calcul des changements par rapport à la veille
-- Stockage dans `marketing_ops.serpbear_rankings`
-
-**Données collectées** :
-- Position actuelle par mot-clé
-- Changements de position
-- Volume de recherche
-- Difficulté du mot-clé
-- URL positionnée
-
----
-
-### 5. **Website Monitoring** (`website-monitoring.json`)
-
-**Objectif** : Surveillance continue de la disponibilité des services
-
-**Déclencheur** : Cron (toutes les 15 minutes)
-
-**Actions** :
-- Test de disponibilité de tous les services
-- Mesure du temps de réponse
-- Détection des erreurs
-- Alertes en cas de problème
-
-**Services surveillés** :
-- Site web Nuxt3
-- Strapi CMS
-- NocoDB
-- n8n
-- Metabase
-- SerpBear
-
----
-
-## 🔧 Installation des Workflows
-
-### 1. Accès à n8n
-```bash
-# Ouvrir n8n dans le navigateur
-http://localhost:5678
-
-# Identifiants par défaut (modifiables dans .env)
-Utilisateur: admin
-Mot de passe: n8n_secure_password_2024!
+**🔄 Flux d'exécution :**
+```
+Planificateur (3h) → Google Analytics API → Traitement des données → PostgreSQL
 ```
 
-### 2. Configuration des Credentials
-
-#### PostgreSQL
-```
-Type: PostgreSQL
-Host: postgres
-Port: 5432
-Database: automation_hub
-Schema: marketing_ops
-Username: [POSTGRES_USER]
-Password: [POSTGRES_PASSWORD]
-```
-
-#### Google APIs
-```
-Type: Google OAuth2 API
-Scopes: 
-- https://www.googleapis.com/auth/analytics.readonly
-- https://www.googleapis.com/auth/adwords
-Client ID: [GOOGLE_CLIENT_ID]
-Client Secret: [GOOGLE_CLIENT_SECRET]
-```
-
-#### OpenAI
-```
-Type: OpenAI
-API Key: [OPENAI_API_KEY]
-```
-
-#### HTTP Authentication (pour SerpBear)
-```
-Type: Header Auth
-Name: Authorization
-Value: Bearer [SERPBEAR_API_KEY]
-```
-
-### 3. Import des Workflows
-
-1. Dans n8n, aller à **Workflows** > **Import from file**
-2. Sélectionner les fichiers `.json` du dossier `n8n/workflows/`
-3. Pour chaque workflow :
-   - Vérifier les credentials
-   - Tester les connexions
-   - Activer le workflow
-
----
-
-## 📊 Workflows Personnalisés Suggérés
-
-### Social Media Collector
-```json
-{
-  "trigger": "Schedule (every 4 hours)",
-  "actions": [
-    "Facebook Pages API - Get page insights",
-    "Instagram Basic Display API - Get media insights", 
-    "LinkedIn Pages API - Get page statistics",
-    "Transform and clean data",
-    "Insert into marketing_ops.social_media_data"
-  ]
-}
-```
-
-### Lead Scoring Automation
-```json
-{
-  "trigger": "Database trigger on new lead",
-  "actions": [
-    "Get lead activity history",
-    "Calculate engagement score",
-    "Apply ML scoring model",
-    "Update lead score",
-    "Trigger actions if score > threshold"
-  ]
-}
-```
-
-### Email Campaign Optimizer
-```json
-{
-  "trigger": "Schedule (weekly)",
-  "actions": [
-    "Analyze email performance data",
-    "Identify best performing subject lines",
-    "Generate A/B test suggestions",
-    "Create optimized campaign templates"
-  ]
-}
-```
-
----
-
-## 🐛 Dépannage des Workflows
-
-### Erreurs Communes
-
-#### Credentials invalides
-```bash
-# Vérifier dans n8n > Settings > Credentials
-# Re-autoriser les APIs OAuth si nécessaire
-```
-
-#### Limites de taux API
-```bash
-# Google Analytics : 100 requêtes/100 secondes
-# Brevo : Variable selon le plan
-# OpenAI : Limite par minute selon le plan
-```
-
-#### Erreurs de base de données
-```bash
-# Vérifier la connectivité PostgreSQL
-docker-compose exec postgres pg_isready -U admin_user
-
-# Vérifier les permissions sur le schéma
-docker-compose exec postgres psql -U admin_user -d automation_hub \
-  -c "SELECT has_schema_privilege('marketing_ops', 'USAGE');"
-```
-
-### Monitoring des Workflows
-
-#### Via n8n Interface
-- **Executions** : Historique des exécutions
-- **Logs** : Détails des erreurs
-- **Manual trigger** : Test manuel
-
-#### Via Base de Données
+**💾 Structure des données :**
 ```sql
--- Vérifier les dernières exécutions de workflows
-SELECT 
-  table_name,
-  MAX(created_at) as last_update,
-  COUNT(*) as records_today
-FROM information_schema.tables t
-JOIN marketing_ops.brevo_email_events b ON true
-WHERE table_schema = 'marketing_ops'
-  AND created_at >= CURRENT_DATE
-GROUP BY table_name;
+-- Table: marketing_ops.google_analytics_data
+property_id TEXT,
+date_collected DATE,
+traffic_source TEXT,
+device_category TEXT,
+country TEXT,
+sessions INTEGER,
+users INTEGER,
+new_users INTEGER,
+page_views INTEGER,
+bounce_rate FLOAT,
+avg_session_duration FLOAT,
+metric_name TEXT,
+metric_value INTEGER,
+raw_data JSONB
 ```
 
 ---
 
-## 📈 Optimisations et Bonnes Pratiques
+### 2. 📧 Brevo Email Events (`brevo-email-events.json`)
 
-### Performance
-- **Batch processing** : Traiter les données par lots
-- **Incremental updates** : Récupérer seulement les nouvelles données
-- **Error handling** : Gestion robuste des erreurs
-- **Retry logic** : Nouvelles tentatives automatiques
+**🎯 Objectif :** Capture en temps réel des événements email (envois, ouvertures, clics, bounces) via webhook.
 
-### Sécurité
-- **API Keys** : Rotation régulière des clés
-- **Permissions** : Accès minimal nécessaire
-- **Logs** : Surveillance des accès suspects
-- **Backup** : Sauvegarde des workflows critiques
+**⏰ Fréquence :** Temps réel (webhook)
 
-### Monitoring
+**🔗 Services connectés :**
+- Brevo (via webhook)
+- PostgreSQL (`marketing_ops.brevo_email_events`)
+
+**📋 Événements trackés :**
+- Envois d'emails
+- Ouvertures
+- Clics sur liens
+- Bounces (échecs de livraison)
+- Désinscriptions
+
+**🔄 Flux d'exécution :**
+```
+Webhook Brevo → Formatage des données → PostgreSQL → Réponse de confirmation
+```
+
+**💾 Structure des données :**
 ```sql
--- Query pour surveiller la santé des workflows
-SELECT 
-  'brevo_events' as source,
-  COUNT(*) as records_last_24h
-FROM marketing_ops.brevo_email_events 
-WHERE created_at >= NOW() - INTERVAL '24 hours'
-UNION ALL
-SELECT 
-  'google_analytics' as source,
-  COUNT(*) as records_last_24h
-FROM marketing_ops.google_analytics_data 
-WHERE created_at >= NOW() - INTERVAL '24 hours';
+-- Table: marketing_ops.brevo_email_events
+event_type TEXT,
+email TEXT,
+subject TEXT,
+campaign_id TEXT,
+message_id TEXT,
+recipient_email TEXT,
+tags JSONB,
+event_date TIMESTAMP
 ```
 
 ---
 
-**Version** : 1.0.0  
-**Dernière mise à jour** : Juin 2025
+### 3. 🔍 SerpBear Rankings (`serpbear-rankings.json`)
+
+**🎯 Objectif :** Collecte des positions SEO des mots-clés suivis pour monitorer le référencement.
+
+**⏰ Fréquence :** Configuration à définir dans SerpBear
+
+**🔗 Services connectés :**
+- SerpBear API
+- PostgreSQL (`marketing_ops.serpbear_rankings`)
+
+**📋 Données collectées :**
+- Positions des mots-clés
+- Domaines surveillés
+- Évolution du ranking
+- Métadonnées de suivi
+
+**🔄 Flux d'exécution :**
+```
+SerpBear API → Traitement positions → PostgreSQL
+```
+
+**💾 Structure des données :**
+```sql
+-- Table: marketing_ops.serpbear_rankings
+keyword TEXT,
+position INTEGER,
+domain TEXT,
+date_collected DATE,
+search_engine TEXT,
+location TEXT,
+device_type TEXT
+```
+
+---
+
+### 4. 🤖 AI Content Analysis (`ai-content-analysis.json`)
+
+**🎯 Objectif :** Analyse hebdomadaire automatique des performances marketing avec génération de recommandations IA.
+
+**⏰ Fréquence :** Hebdomadaire (lundi 9h)
+
+**🔗 Services connectés :**
+- PostgreSQL (lecture des données analytics, SEO, social)
+- OpenAI API
+- PostgreSQL (`marketing_ops.ai_insights`)
+
+**📋 Analyses générées :**
+- Synthèse des performances hebdomadaires
+- 3 recommandations d'amélioration
+- 5 idées de contenu basées sur les données
+- Tendances et insights actionnables
+
+**🔄 Flux d'exécution :**
+```
+Planificateur → Agrégation des données → Prompt IA → OpenAI → Sauvegarde insights
+```
+
+**🧠 Intelligence artificielle :**
+- Analyse croisée des données GA, SEO et réseaux sociaux
+- Génération de recommandations personnalisées
+- Identification des opportunités d'amélioration
+- Suggestions de contenu basées sur les performances
+
+---
+
+### 5. 🌐 Website Monitoring (`website-monitoring.json`)
+
+**🎯 Objectif :** Surveillance continue de la disponibilité et des performances des services de la plateforme.
+
+**⏰ Fréquence :** Toutes les 15 minutes
+
+**🔗 Services surveillés :**
+- `http://website:3000` (Site Nuxt)
+- `http://strapi:1337` (CMS Strapi)
+- `http://nocodb:8080` (Interface NocoDB)
+- `http://n8n:5678` (n8n)
+- `http://metabase:3000` (Analytics Metabase)
+- `http://serpbear:3000` (Monitoring SEO)
+
+**📋 Métriques collectées :**
+- Code de statut HTTP
+- Temps de réponse
+- Taille du contenu
+- Titre de la page
+- Statut de disponibilité
+- Validation SSL
+
+**🔄 Flux d'exécution :**
+```
+Planificateur (15min) → Test chaque URL → Traitement réponse → PostgreSQL → Alertes si erreur
+```
+
+**🚨 Système d'alertes :**
+- Détection automatique des pannes
+- Formatage des messages d'alerte
+- Notification en temps réel
+
+**💾 Structure des données :**
+```sql
+-- Table: marketing_ops.website_content_monitor
+url_checked TEXT,
+http_status_code INTEGER,
+response_time INTEGER,
+content_length INTEGER,
+extracted_title TEXT,
+is_available BOOLEAN,
+error_message TEXT,
+fetch_timestamp TIMESTAMP,
+ssl_valid BOOLEAN
+```
+
+---
+
+## 🚀 Workflows Supplémentaires Recommandés
+
+### 6. 📱 Social Media Performance Monitor
+
+**🎯 Objectif :** Collecte automatique des métriques des réseaux sociaux.
+
+**⏰ Fréquence :** Quotidienne (5h du matin)
+
+**🔗 APIs à intégrer :**
+- Facebook/Instagram Graph API
+- Twitter API v2
+- LinkedIn API
+- YouTube Analytics API
+
+**📊 Métriques :**
+- Followers, engagement rate
+- Likes, commentaires, partages
+- Reach et impressions
+- Clics sur liens
+
+---
+
+### 7. 💰 E-commerce Analytics (si applicable)
+
+**🎯 Objectif :** Suivi des ventes et conversions e-commerce.
+
+**⏰ Fréquence :** Temps réel + résumé quotidien
+
+**📊 Métriques :**
+- Revenus, commandes, panier moyen
+- Taux de conversion
+- Produits les plus vendus
+- Abandons de panier
+
+---
+
+### 8. 🔒 Security & Performance Alerts
+
+**🎯 Objectif :** Monitoring avancé de la sécurité et des performances.
+
+**⏰ Fréquence :** Continue
+
+**🔍 Surveillances :**
+- Tentatives d'intrusion
+- Charge serveur
+- Erreurs 404 fréquentes
+- Temps de réponse anormaux
+
+---
+
+### 9. 📋 Content Audit & SEO Health Check
+
+**🎯 Objectif :** Audit automatique du contenu et de la santé SEO.
+
+**⏰ Fréquence :** Hebdomadaire
+
+**🔍 Vérifications :**
+- Pages sans meta description
+- Contenu dupliqué
+- Liens cassés
+- Images sans alt text
+
+---
+
+### 10. 💬 Customer Feedback Aggregator
+
+**🎯 Objectif :** Centralisation des retours clients de toutes sources.
+
+**⏰ Fréquence :** Temps réel
+
+**📥 Sources :**
+- Formulaires de contact
+- Avis Google/Facebook
+- Support client
+- Enquêtes de satisfaction
+
+---
+
+## 🛠️ Configuration et Maintenance
+
+### Variables d'environnement requises
+
+```env
+# Google Analytics
+GOOGLE_ANALYTICS_PROPERTY_ID=GA4_PROPERTY_ID
+
+# OpenAI
+OPENAI_API_KEY=sk-xxx
+
+# Base de données
+POSTGRES_HOST=postgres
+POSTGRES_DB=marketing_ops
+POSTGRES_USER=n8n_user
+POSTGRES_PASSWORD=secure_password
+
+# Brevo
+BREVO_WEBHOOK_SECRET=webhook_secret
+```
+
+### Credentials n8n requis
+
+1. **Google Analytics OAuth2** (`google-analytics-oauth`)
+2. **PostgreSQL Main** (`postgres-main`)
+3. **OpenAI API** (`openai-api`)
+
+### Monitoring des workflows
+
+- **Logs centralisés** dans n8n
+- **Alertes d'échec** configurables
+- **Métriques de performance** suivies
+- **Historique d'exécution** conservé
+
+---
+
+## 📈 Tableaux de bord et visualisations
+
+### Metabase Dashboards recommandés
+
+1. **🎯 Marketing Performance Overview**
+   - GA metrics + SEO positions
+   - Tendances sur 30 jours
+   - Comparaisons périodiques
+
+2. **📧 Email Marketing Dashboard**
+   - Taux d'ouverture/clic par campagne
+   - Évolution des performances
+   - Segmentation des audiences
+
+3. **🔍 SEO Monitoring Dashboard**
+   - Évolution des positions
+   - Mots-clés gagnants/perdants
+   - Opportunités d'amélioration
+
+4. **🌐 Infrastructure Health Dashboard**
+   - Disponibilité des services
+   - Temps de réponse
+   - Alertes et incidents
+
+5. **🧠 AI Insights Dashboard**
+   - Recommandations générées
+   - Suivi des actions mises en place
+   - ROI des optimisations
+
+---
+
+## 🔧 Maintenance et évolutions
+
+### Actions de maintenance régulières
+
+- **Nettoyage des données** anciennes (>6 mois)
+- **Optimisation des requêtes** PostgreSQL
+- **Mise à jour des credentials** API
+- **Test des workflows** de backup
+
+### Évolutions prévues
+
+- **Machine Learning** pour prédictions
+- **Automatisation marketing** avancée
+- **Intégrations CRM** (HubSpot, Salesforce)
+- **Analyse de sentiment** des retours clients
+
+---
+
+## 📞 Support et dépannage
+
+### Logs et debugging
+
+```bash
+# Voir les logs n8n
+docker-compose logs n8n
+
+# Vérifier la base de données
+docker-compose exec postgres psql -U postgres -d marketing_ops
+```
+
+### Points de vérification
+
+1. **Connectivité APIs** - Credentials valides
+2. **Espace disque** - PostgreSQL et logs
+3. **Performances** - Temps d'exécution des workflows
+4. **Données** - Cohérence et qualité
+
+---
+
+*Cette documentation évolue avec la plateforme. Dernière mise à jour : juin 2025*

@@ -217,16 +217,17 @@ export default defineNuxtPlugin(() => {
 ---
 
 ### 📝 Strapi CMS (`strapi:1337`)
-**CMS headless puissant et extensible**
+**CMS headless puissant et extensible avec plugins SEO avancés**
 
 **Fonctionnalités :**
-- 🎛️ **Interface d'administration** intuitive
+- 🎛️ **Interface d'administration** intuitive en français
 - 🔧 **Content Types** flexibles et personnalisables
 - 🔐 **Système d'authentification** et rôles utilisateurs
 - 📡 **API REST & GraphQL** auto-générées
 - 🔌 **Plugins** et extensions personnalisées
 - 📂 **Gestion des médias** avec optimisation d'images
-- 🌍 **Internationalisation** native
+- 🌍 **Internationalisation** native avec support français
+- 🔍 **Plugin SEO intégré** (@strapi/plugin-seo) pour l'optimisation automatique
 
 **Base de données dédiée :**
 ```sql
@@ -244,6 +245,8 @@ export default defineNuxtPlugin(() => {
 - Compression et optimisation automatiques
 - Webhooks pour synchroniser avec n8n
 - Backup automatique des contenus
+- **Interface admin en français** pour faciliter l'utilisation
+- **Plugin SEO intégré** avec méta-données automatiques et optimisations
 
 ---
 
@@ -638,7 +641,7 @@ curl http://localhost:5050  # pgAdmin
 | **Service** | **URL** | **Identifiants par défaut** |
 |-------------|---------|------------------------------|
 | 🌐 **Website** | http://localhost:3333 | - (public) |
-| 📝 **Strapi Admin** | http://localhost:1337/admin | (créer lors du 1er accès) |
+| 📝 **Strapi Admin** | http://localhost:1337/admin | (créer lors du 1er accès - interface française) |
 | 🤖 **n8n** | http://localhost:5678 | admin / (voir .env) |
 | 📊 **Metabase** | http://localhost:3000 | (configuration au 1er accès) |
 | 🔍 **SerpBear** | http://localhost:3001 | (créer compte au 1er accès) |
@@ -741,18 +744,25 @@ GOOGLE_ANALYTICS_PROPERTY_ID=123456789                  # GA4 Property ID
 #### 4. Configuration Strapi CMS
 
 ```bash
-# 1. Premier accès
+# 1. Premier accès (interface en français)
 # → http://localhost:1337/admin
 # → Créer compte administrateur
 
-# 2. Générer token API pour Nuxt
+# 2. Plugin SEO automatique
+# → Le plugin @strapi/plugin-seo est pré-installé
+# → Configuration automatique des méta-données
+# → SEO Score et recommandations intégrées
+# → Optimisation automatique des URLs
+
+# 3. Générer token API pour Nuxt
 # → Paramètres → API Tokens → Create new API Token
 # → Type : Read-only ou Full access
 # → Copier le token dans .env :
 STRAPI_API_TOKEN=votre_token_généré
 
-# 3. Configuration des Content Types
+# 4. Configuration des Content Types
 # → Content-Type Builder → Créer vos types de contenu
+# → Le plugin SEO ajoute automatiquement les champs SEO
 # → Settings → Users & Permissions → Configurer accès public
 ```
 
@@ -930,6 +940,62 @@ L'intelligence artificielle est entièrement configurable via n8n selon vos beso
 - ✅ **Sécurité** : credentials centralisés dans n8n
 
 ## 📈 SEO et Analytics
+
+## 📈 SEO et Marketing
+
+### 🔍 Plugin SEO Strapi Intégré
+
+**@strapi/plugin-seo v2.0.8 - Optimisation automatique du contenu**
+
+**Fonctionnalités avancées :**
+- 🎯 **SEO Score** en temps réel lors de la rédaction
+- 📝 **Méta-données automatiques** (title, description, keywords)
+- 🔗 **URLs optimisées** avec slugs SEO-friendly
+- 🌐 **Open Graph** et **Twitter Cards** automatiques
+- 📊 **Analyse de contenu** et suggestions d'amélioration
+- 🖼️ **Images SEO** avec alt-text intelligents
+- 📈 **Suivi des performances** par article
+- 🤖 **Compatible JSON-LD** pour le référencement IA
+- 🇫🇷 **Interface française** pour faciliter l'utilisation
+
+**Interface utilisateur (en français) :**
+```typescript
+// Champs SEO automatiquement ajoutés à vos Content Types
+{
+  metaTitle: "Titre optimisé (55-60 caractères)",
+  metaDescription: "Description engageante (150-160 caractères)",
+  keywords: "mots-clés, pertinents, ciblés",
+  metaRobots: "index,follow",
+  structuredData: { /* JSON-LD automatique */ },
+  metaViewport: "width=device-width, initial-scale=1",
+  canonicalURL: "https://votre-site.com/article-optimise"
+}
+```
+
+**Intégration avec Nuxt 3 :**
+```vue
+<!-- Méta-données automatiquement récupérées depuis Strapi -->
+<template>
+  <div>
+    <Head>
+      <Title>{{ article.seo.metaTitle }}</Title>
+      <Meta name="description" :content="article.seo.metaDescription" />
+      <Meta name="keywords" :content="article.seo.keywords" />
+      <Meta property="og:title" :content="article.seo.metaTitle" />
+      <Meta property="og:description" :content="article.seo.metaDescription" />
+    </Head>
+    <!-- Contenu article -->
+  </div>
+</template>
+```
+
+**Avantages du plugin intégré :**
+- ✅ **Score SEO temps réel** pendant la rédaction
+- ✅ **Suggestions automatiques** d'amélioration
+- ✅ **Prévisualisation** Google/réseaux sociaux
+- ✅ **Validation automatique** des balises
+- ✅ **Interface française** intuitive
+- ✅ **API REST/GraphQL** pour récupération côté Nuxt
 
 ### 🤖 SEO Moderne et Référencement IA
 

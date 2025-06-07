@@ -46,7 +46,136 @@ create_database_if_not_exists "marketing_ops"
 
 echo "Toutes les bases de données ont été créées avec leurs privilèges!"
 
-# Initialisation de la base Brevo pour les événements email
+# Initialisation du schéma marketing_ops
+echo "Initialisation du schéma marketing_ops..."
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "marketing_ops" <<-EOSQL
+    -- Création du schéma marketing_ops
+    CREATE SCHEMA IF NOT EXISTS marketing_ops;
+
+    -- Table Google Analytics
+    CREATE TABLE IF NOT EXISTS marketing_ops.google_analytics_data (
+        id SERIAL PRIMARY KEY,
+        property_id TEXT NOT NULL,
+        date_collected DATE NOT NULL,
+        traffic_source TEXT,
+        device_category TEXT,
+        country TEXT,
+        sessions INTEGER DEFAULT 0,
+        users INTEGER DEFAULT 0,
+        new_users INTEGER DEFAULT 0,
+        page_views INTEGER DEFAULT 0,
+        bounce_rate FLOAT DEFAULT 0,
+        avg_session_duration FLOAT DEFAULT 0,
+        metric_name TEXT,
+        metric_value INTEGER DEFAULT 0,
+        raw_data JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(property_id, date_collected, traffic_source, device_category, country)
+    );
+
+    -- Table Brevo Email Events
+    CREATE TABLE IF NOT EXISTS marketing_ops.brevo_email_events (
+        id SERIAL PRIMARY KEY,
+        event_type TEXT NOT NULL,
+        email TEXT NOT NULL,
+        subject TEXT,
+        campaign_id TEXT,
+        message_id TEXT,
+        recipient_email TEXT,
+        tags JSONB,
+        event_date TIMESTAMP NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Table SerpBear Rankings
+    CREATE TABLE IF NOT EXISTS marketing_ops.serpbear_rankings (
+        id SERIAL PRIMARY KEY,
+        keyword TEXT NOT NULL,
+        position INTEGER,
+        domain TEXT NOT NULL,
+        date_collected DATE NOT NULL,
+        search_engine TEXT DEFAULT 'google',
+        location TEXT DEFAULT 'france',
+        device_type TEXT DEFAULT 'desktop',
+        url TEXT,
+        title TEXT,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(keyword, domain, date_collected, search_engine, location, device_type)
+    );
+
+    -- Table Website Monitoring
+    CREATE TABLE IF NOT EXISTS marketing_ops.website_content_monitor (
+        id SERIAL PRIMARY KEY,
+        url_checked TEXT NOT NULL,
+        http_status_code INTEGER,
+        response_time INTEGER,
+        content_length INTEGER,
+        extracted_title TEXT,
+        is_available BOOLEAN DEFAULT FALSE,
+        error_message TEXT,
+        fetch_timestamp TIMESTAMP NOT NULL,
+        ssl_valid BOOLEAN,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Table AI Insights
+    CREATE TABLE IF NOT EXISTS marketing_ops.ai_insights (
+        id SERIAL PRIMARY KEY,
+        analysis_type TEXT NOT NULL,
+        analysis_date DATE NOT NULL,
+        recommendations JSONB,
+        content_ideas JSONB,
+        data_sources JSONB,
+        confidence_score FLOAT,
+        insights_summary TEXT,
+        action_items JSONB,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(analysis_type, analysis_date)
+    );
+
+    -- Table Social Media Data
+    CREATE TABLE IF NOT EXISTS marketing_ops.social_media_data (
+        id SERIAL PRIMARY KEY,
+        platform TEXT NOT NULL,
+        metric_name TEXT NOT NULL,
+        metric_value INTEGER DEFAULT 0,
+        date_collected DATE NOT NULL,
+        additional_data JSONB,
+        engagement_rate FLOAT,
+        likes INTEGER DEFAULT 0,
+        comments INTEGER DEFAULT 0,
+        shares INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(platform, metric_name, date_collected)
+    );
+
+    -- Index pour les performances
+    CREATE INDEX IF NOT EXISTS idx_ga_data_date ON marketing_ops.google_analytics_data(date_collected);
+    CREATE INDEX IF NOT EXISTS idx_brevo_events_date ON marketing_ops.brevo_email_events(event_date);
+    CREATE INDEX IF NOT EXISTS idx_serpbear_date ON marketing_ops.serpbear_rankings(date_collected);
+    CREATE INDEX IF NOT EXISTS idx_website_monitor_timestamp ON marketing_ops.website_content_monitor(fetch_timestamp);
+    CREATE INDEX IF NOT EXISTS idx_social_media_date ON marketing_ops.social_media_data(date_collected);
+
+    -- Vue pour dashboard marketing
+    CREATE OR REPLACE VIEW marketing_ops.marketing_overview_daily AS
+    SELECT 
+        date_collected,
+        SUM(sessions) as total_sessions,
+        SUM(users) as total_users,
+        SUM(page_views) as total_pageviews,
+        AVG(bounce_rate) as avg_bounce_rate
+    FROM marketing_ops.google_analytics_data 
+    GROUP BY date_collected
+    ORDER BY date_collected DESC;
+
+    GRANT ALL PRIVILEGES ON SCHEMA marketing_ops TO "$POSTGRES_USER";
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA marketing_ops TO "$POSTGRES_USER";
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA marketing_ops TO "$POSTGRES_USER";
+EOSQL
+
+echo "Schéma marketing_ops initialisé avec succès!"
+
+# Initialisation de la base Brevo pour les événements email (compatible legacy)
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "brevo" <<-EOSQL
     DROP TABLE IF EXISTS email_events;
     CREATE TABLE email_events (

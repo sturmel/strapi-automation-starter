@@ -1,0 +1,205 @@
+{
+  "name": "Security & Performance Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "value": "*/30 * * * *"
+            }
+          ]
+        }
+      },
+      "id": "security-schedule",
+      "name": "Every 30 Minutes",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "query": "SELECT \n  url_checked,\n  response_time,\n  is_available,\n  fetch_timestamp\nFROM marketing_ops.website_content_monitor \nWHERE fetch_timestamp >= NOW() - INTERVAL '2 hours'\nORDER BY fetch_timestamp DESC"
+      },
+      "id": "get-recent-monitoring",
+      "name": "Get Recent Monitoring Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [460, 200],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "command": "df -h | grep -E '^/dev/' && free -h && docker stats --no-stream --format 'table {{.Name}}\\t{{.CPUPerc}}\\t{{.MemUsage}}\\t{{.MemPerc}}'"
+      },
+      "id": "check-system-resources",
+      "name": "Check System Resources",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [460, 400]
+    },
+    {
+      "parameters": {
+        "command": "tail -n 100 /var/log/nginx/access.log | grep -E '(404|500|502|503)' | wc -l && tail -n 100 /var/log/nginx/access.log | grep -E '(POST|PUT|DELETE)' | head -10"
+      },
+      "id": "check-nginx-logs",
+      "name": "Check Nginx Logs",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [460, 600],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "functionCode": "const monitoringData = $input.all()[0].json || [];\nconst systemData = $input.all()[1]?.json?.stdout || '';\nconst nginxLogs = $input.all()[2]?.json?.stdout || '';\n\n// Analyse des performances\nconst performanceIssues = [];\nconst securityAlerts = [];\n\n// 1. Analyse des temps de réponse\nif (Array.isArray(monitoringData)) {\n  const avgResponseTimes = {};\n  const downtime = {};\n  \n  monitoringData.forEach(record => {\n    const url = record.url_checked;\n    if (!avgResponseTimes[url]) {\n      avgResponseTimes[url] = [];\n      downtime[url] = 0;\n    }\n    \n    if (record.response_time) {\n      avgResponseTimes[url].push(record.response_time);\n    }\n    \n    if (!record.is_available) {\n      downtime[url]++;\n    }\n  });\n  \n  // Alertes de performance\n  Object.entries(avgResponseTimes).forEach(([url, times]) => {\n    if (times.length > 0) {\n      const avg = times.reduce((a, b) => a + b, 0) / times.length;\n      if (avg > 3000) { // Plus de 3 secondes\n        performanceIssues.push({\n          type: 'slow_response',\n          url: url,\n          avg_response_time: Math.round(avg),\n          severity: avg > 5000 ? 'critical' : 'warning'\n        });\n      }\n    }\n  });\n  \n  // Alertes de disponibilité\n  Object.entries(downtime).forEach(([url, down_count]) => {\n    if (down_count > 0) {\n      securityAlerts.push({\n        type: 'service_downtime',\n        url: url,\n        down_incidents: down_count,\n        severity: 'critical'\n      });\n    }\n  });\n}\n\n// 2. Analyse des ressources système\nconst systemAlerts = [];\nif (systemData) {\n  const lines = systemData.split('\\n');\n  \n  // Analyse du disque\n  lines.forEach(line => {\n    if (line.includes('%') && line.includes('/dev/')) {\n      const match = line.match(/(\\d+)%/);\n      if (match) {\n        const usage = parseInt(match[1]);\n        if (usage > 90) {\n          systemAlerts.push({\n            type: 'disk_space_critical',\n            usage: usage,\n            details: line.trim(),\n            severity: 'critical'\n          });\n        } else if (usage > 80) {\n          systemAlerts.push({\n            type: 'disk_space_warning',\n            usage: usage,\n            details: line.trim(),\n            severity: 'warning'\n          });\n        }\n      }\n    }\n  });\n  \n  // Analyse des conteneurs Docker\n  lines.forEach(line => {\n    if (line.includes('%') && (line.includes('website') || line.includes('strapi') || line.includes('postgres'))) {\n      const parts = line.split(/\\s+/);\n      if (parts.length >= 3) {\n        const cpuMatch = parts[1]?.match(/(\\d+\\.\\d+)%/);\n        const memMatch = parts[3]?.match(/(\\d+\\.\\d+)%/);\n        \n        if (cpuMatch && parseFloat(cpuMatch[1]) > 80) {\n          systemAlerts.push({\n            type: 'high_cpu_usage',\n            container: parts[0],\n            cpu_usage: parseFloat(cpuMatch[1]),\n            severity: 'warning'\n          });\n        }\n        \n        if (memMatch && parseFloat(memMatch[1]) > 85) {\n          systemAlerts.push({\n            type: 'high_memory_usage',\n            container: parts[0],\n            memory_usage: parseFloat(memMatch[1]),\n            severity: 'warning'\n          });\n        }\n      }\n    }\n  });\n}\n\n// 3. Analyse des logs de sécurité\nif (nginxLogs) {\n  const errorCount = parseInt(nginxLogs.split('\\n')[0]) || 0;\n  \n  if (errorCount > 10) {\n    securityAlerts.push({\n      type: 'high_error_rate',\n      error_count: errorCount,\n      severity: errorCount > 50 ? 'critical' : 'warning',\n      description: `${errorCount} erreurs HTTP détectées dans les logs récents`\n    });\n  }\n}\n\n// Résumé global\nconst totalIssues = performanceIssues.length + securityAlerts.length + systemAlerts.length;\nconst criticalIssues = [...performanceIssues, ...securityAlerts, ...systemAlerts]\n  .filter(issue => issue.severity === 'critical').length;\n\nreturn [{\n  json: {\n    monitoring_report: {\n      timestamp: new Date().toISOString(),\n      total_issues: totalIssues,\n      critical_issues: criticalIssues,\n      status: criticalIssues > 0 ? 'critical' : (totalIssues > 0 ? 'warning' : 'healthy'),\n      performance_issues: performanceIssues,\n      security_alerts: securityAlerts,\n      system_alerts: systemAlerts,\n      system_health_score: Math.max(0, 100 - (criticalIssues * 30) - ((totalIssues - criticalIssues) * 10))\n    }\n  }\n}];"
+      },
+      "id": "analyze-security-performance",
+      "name": "Analyze Security & Performance",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "marketing_ops",
+        "table": "security_monitoring",
+        "columns": "check_timestamp, total_issues, critical_issues, system_health_score, performance_issues, security_alerts, system_alerts",
+        "additionalFields": {}
+      },
+      "id": "save-security-report",
+      "name": "Save Security Report",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [900, 400],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.monitoring_report.critical_issues }}",
+              "operation": "larger",
+              "value2": 0
+            }
+          ]
+        }
+      },
+      "id": "check-critical-issues",
+      "name": "Check Critical Issues",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [900, 600]
+    },
+    {
+      "parameters": {
+        "functionCode": "const report = $json.monitoring_report;\n\nlet alertMessage = `🛡️ ALERTE SÉCURITÉ & PERFORMANCE\\n\\n`;\nalertMessage += `📊 Score de santé système: ${report.system_health_score}/100\\n`;\nalertMessage += `⚠️ Total des problèmes: ${report.total_issues}\\n`;\nalertMessage += `🚨 Problèmes critiques: ${report.critical_issues}\\n\\n`;\n\n// Détailler les problèmes critiques\nif (report.performance_issues.length > 0) {\n  alertMessage += `🐌 PROBLÈMES DE PERFORMANCE:\\n`;\n  report.performance_issues.forEach(issue => {\n    if (issue.severity === 'critical') {\n      alertMessage += `• ${issue.url}: ${issue.avg_response_time}ms (critique)\\n`;\n    }\n  });\n  alertMessage += `\\n`;\n}\n\nif (report.security_alerts.length > 0) {\n  alertMessage += `🔒 ALERTES DE SÉCURITÉ:\\n`;\n  report.security_alerts.forEach(alert => {\n    alertMessage += `• ${alert.type}: ${alert.description || alert.url}\\n`;\n  });\n  alertMessage += `\\n`;\n}\n\nif (report.system_alerts.length > 0) {\n  alertMessage += `⚙️ ALERTES SYSTÈME:\\n`;\n  report.system_alerts.forEach(alert => {\n    if (alert.severity === 'critical') {\n      alertMessage += `• ${alert.type}: ${alert.details || alert.container}\\n`;\n    }\n  });\n  alertMessage += `\\n`;\n}\n\nalertMessage += `📅 Vérification: ${new Date(report.timestamp).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}\\n\\n`;\nalertMessage += `🔧 Action immédiate requise pour résoudre les problèmes critiques.`;\n\nreturn [{\n  json: {\n    alert_type: 'security_performance',\n    severity: 'critical',\n    message: alertMessage,\n    critical_count: report.critical_issues,\n    health_score: report.system_health_score\n  }\n}];"
+      },
+      "id": "format-security-alert",
+      "name": "Format Security Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1120, 600]
+    }
+  ],
+  "connections": {
+    "Every 30 Minutes": {
+      "main": [
+        [
+          {
+            "node": "Get Recent Monitoring Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check System Resources",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Nginx Logs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Recent Monitoring Data": {
+      "main": [
+        [
+          {
+            "node": "Analyze Security & Performance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check System Resources": {
+      "main": [
+        [
+          {
+            "node": "Analyze Security & Performance",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Check Nginx Logs": {
+      "main": [
+        [
+          {
+            "node": "Analyze Security & Performance",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Analyze Security & Performance": {
+      "main": [
+        [
+          {
+            "node": "Save Security Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Critical Issues",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Critical Issues": {
+      "main": [
+        [
+          {
+            "node": "Format Security Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "Europe/Paris"
+  },
+  "id": "security-performance-monitor"
+}

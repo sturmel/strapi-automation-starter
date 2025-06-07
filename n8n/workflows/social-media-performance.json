@@ -1,0 +1,231 @@
+{
+  "name": "Social Media Performance Monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "value": "0 5 * * *"
+            }
+          ]
+        }
+      },
+      "id": "daily-schedule",
+      "name": "Daily Schedule (5AM)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "resource": "page",
+        "operation": "getInsights",
+        "pageId": "={{ $env.FACEBOOK_PAGE_ID }}",
+        "metric": [
+          "page_fans",
+          "page_fan_adds",
+          "page_impressions",
+          "page_engaged_users",
+          "page_post_engagements",
+          "page_posts_impressions"
+        ],
+        "period": "day",
+        "since": "={{ $today.minus({days: 1}).toFormat('yyyy-MM-dd') }}",
+        "until": "={{ $today.toFormat('yyyy-MM-dd') }}"
+      },
+      "id": "facebook-insights",
+      "name": "Facebook Page Insights",
+      "type": "n8n-nodes-base.facebookGraphApi",
+      "typeVersion": 1,
+      "position": [460, 200],
+      "credentials": {
+        "facebookGraphApi": {
+          "id": "facebook-api",
+          "name": "Facebook Graph API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "tweet",
+        "operation": "getTweets",
+        "userId": "={{ $env.TWITTER_USER_ID }}",
+        "additionalFields": {
+          "maxResults": 10,
+          "tweetFields": [
+            "created_at",
+            "public_metrics",
+            "context_annotations"
+          ]
+        }
+      },
+      "id": "twitter-metrics",
+      "name": "Twitter Metrics",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [460, 400],
+      "credentials": {
+        "twitterOAuth2Api": {
+          "id": "twitter-oauth",
+          "name": "Twitter OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "analyticsReports",
+        "operation": "get",
+        "channelId": "={{ $env.YOUTUBE_CHANNEL_ID }}",
+        "metrics": [
+          "views",
+          "estimatedMinutesWatched",
+          "averageViewDuration",
+          "subscribersGained",
+          "likes",
+          "comments"
+        ],
+        "dimensions": [
+          "day"
+        ],
+        "startDate": "={{ $today.minus({days: 1}).toFormat('yyyy-MM-dd') }}",
+        "endDate": "={{ $today.toFormat('yyyy-MM-dd') }}"
+      },
+      "id": "youtube-analytics",
+      "name": "YouTube Analytics",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [460, 600],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "youtube-oauth",
+          "name": "YouTube OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Traitement des données Facebook\nconst facebookData = $input.all()[0].json;\nconst twitterData = $input.all()[1].json;\nconst youtubeData = $input.all()[2].json;\n\nconst processedData = [];\nconst today = new Date().toISOString().split('T')[0];\n\n// Facebook\nif (facebookData && facebookData.data) {\n  facebookData.data.forEach(metric => {\n    processedData.push({\n      platform: 'facebook',\n      metric_name: metric.name,\n      metric_value: metric.values[0]?.value || 0,\n      date_collected: today,\n      additional_data: JSON.stringify(metric)\n    });\n  });\n}\n\n// Twitter\nif (twitterData && twitterData.data) {\n  const totalMetrics = {\n    tweets_count: twitterData.data.length,\n    total_retweets: 0,\n    total_likes: 0,\n    total_replies: 0\n  };\n  \n  twitterData.data.forEach(tweet => {\n    if (tweet.public_metrics) {\n      totalMetrics.total_retweets += tweet.public_metrics.retweet_count;\n      totalMetrics.total_likes += tweet.public_metrics.like_count;\n      totalMetrics.total_replies += tweet.public_metrics.reply_count;\n    }\n  });\n  \n  Object.entries(totalMetrics).forEach(([key, value]) => {\n    processedData.push({\n      platform: 'twitter',\n      metric_name: key,\n      metric_value: value,\n      date_collected: today,\n      additional_data: JSON.stringify(totalMetrics)\n    });\n  });\n}\n\n// YouTube\nif (youtubeData && youtubeData.rows) {\n  youtubeData.columnHeaders.forEach((header, index) => {\n    if (header.name !== 'day') {\n      processedData.push({\n        platform: 'youtube',\n        metric_name: header.name,\n        metric_value: parseInt(youtubeData.rows[0][index]) || 0,\n        date_collected: today,\n        additional_data: JSON.stringify(youtubeData.rows[0])\n      });\n    }\n  });\n}\n\nreturn processedData.map(item => ({ json: item }));"
+      },
+      "id": "process-social-data",
+      "name": "Process Social Media Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [680, 400]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "marketing_ops",
+        "table": "social_media_data",
+        "columns": "platform, metric_name, metric_value, date_collected, additional_data",
+        "additionalFields": {}
+      },
+      "id": "save-social-data",
+      "name": "Save Social Media Data",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [900, 400],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "// Calcul des KPIs et détection d'anomalies\nconst data = $input.all();\nconst alerts = [];\nconst kpis = {};\n\n// Grouper par plateforme\ndata.forEach(item => {\n  const platform = item.json.platform;\n  if (!kpis[platform]) kpis[platform] = {};\n  kpis[platform][item.json.metric_name] = item.json.metric_value;\n});\n\n// Détection d'anomalies simples (à améliorer avec des données historiques)\nObject.entries(kpis).forEach(([platform, metrics]) => {\n  // Exemple : alerte si engagement très bas\n  if (platform === 'facebook' && metrics.page_engaged_users < 10) {\n    alerts.push({\n      platform,\n      alert_type: 'low_engagement',\n      message: `Engagement Facebook très bas: ${metrics.page_engaged_users} utilisateurs`,\n      severity: 'warning',\n      date: new Date().toISOString()\n    });\n  }\n  \n  if (platform === 'youtube' && metrics.views < 100) {\n    alerts.push({\n      platform,\n      alert_type: 'low_views',\n      message: `Vues YouTube faibles: ${metrics.views} vues`,\n      severity: 'warning',\n      date: new Date().toISOString()\n    });\n  }\n});\n\nreturn [\n  {\n    json: {\n      kpis,\n      alerts,\n      summary: {\n        total_platforms: Object.keys(kpis).length,\n        alerts_count: alerts.length,\n        date_processed: new Date().toISOString()\n      }\n    }\n  }\n];"
+      },
+      "id": "analyze-performance",
+      "name": "Analyze Performance & Generate KPIs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1120, 400]
+    }
+  ],
+  "connections": {
+    "Daily Schedule (5AM)": {
+      "main": [
+        [
+          {
+            "node": "Facebook Page Insights",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Twitter Metrics",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "YouTube Analytics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Facebook Page Insights": {
+      "main": [
+        [
+          {
+            "node": "Process Social Media Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Twitter Metrics": {
+      "main": [
+        [
+          {
+            "node": "Process Social Media Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "YouTube Analytics": {
+      "main": [
+        [
+          {
+            "node": "Process Social Media Data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Process Social Media Data": {
+      "main": [
+        [
+          {
+            "node": "Save Social Media Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Social Media Data": {
+      "main": [
+        [
+          {
+            "node": "Analyze Performance & Generate KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "Europe/Paris"
+  },
+  "id": "social-media-performance-monitor"
+}

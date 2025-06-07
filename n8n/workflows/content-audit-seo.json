@@ -1,0 +1,224 @@
+{
+  "name": "Content Audit & SEO Health Check",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "value": "0 6 * * 1"
+            }
+          ]
+        }
+      },
+      "id": "weekly-schedule",
+      "name": "Weekly Schedule (Monday 6AM)",
+      "type": "n8n-nodes-base.cron",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "query": "SELECT \n  id,\n  title,\n  slug,\n  meta_description,\n  created_at,\n  updated_at,\n  published_at\nFROM strapi.articles \nWHERE published_at IS NOT NULL\nORDER BY updated_at DESC"
+      },
+      "id": "get-published-content",
+      "name": "Get Published Content",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const articles = $input.all();\nconst issues = [];\nconst seoChecks = [];\n\narticles.forEach(article => {\n  const item = article.json;\n  const checks = {\n    article_id: item.id,\n    title: item.title,\n    slug: item.slug,\n    audit_date: new Date().toISOString(),\n    issues_found: []\n  };\n  \n  // Vérifications SEO de base\n  \n  // 1. Meta description manquante ou trop courte/longue\n  if (!item.meta_description) {\n    checks.issues_found.push('missing_meta_description');\n  } else if (item.meta_description.length < 120) {\n    checks.issues_found.push('meta_description_too_short');\n  } else if (item.meta_description.length > 160) {\n    checks.issues_found.push('meta_description_too_long');\n  }\n  \n  // 2. Titre trop court ou trop long\n  if (!item.title) {\n    checks.issues_found.push('missing_title');\n  } else if (item.title.length < 30) {\n    checks.issues_found.push('title_too_short');\n  } else if (item.title.length > 60) {\n    checks.issues_found.push('title_too_long');\n  }\n  \n  // 3. Slug non optimisé\n  if (!item.slug) {\n    checks.issues_found.push('missing_slug');\n  } else if (item.slug.length > 75) {\n    checks.issues_found.push('slug_too_long');\n  }\n  \n  // 4. Contenu pas mis à jour depuis longtemps\n  const lastUpdate = new Date(item.updated_at);\n  const monthsOld = (Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24 * 30);\n  if (monthsOld > 6) {\n    checks.issues_found.push('content_outdated');\n  }\n  \n  checks.total_issues = checks.issues_found.length;\n  checks.seo_score = Math.max(0, 100 - (checks.total_issues * 20));\n  \n  seoChecks.push(checks);\n  \n  // Ajouter aux issues globales si problème détecté\n  if (checks.total_issues > 0) {\n    issues.push({\n      type: 'seo_issue',\n      severity: checks.total_issues > 2 ? 'high' : 'medium',\n      article_id: item.id,\n      article_title: item.title,\n      issues: checks.issues_found,\n      seo_score: checks.seo_score\n    });\n  }\n});\n\nreturn [{\n  json: {\n    audit_summary: {\n      total_articles: articles.length,\n      articles_with_issues: issues.length,\n      avg_seo_score: seoChecks.reduce((sum, check) => sum + check.seo_score, 0) / seoChecks.length,\n      audit_date: new Date().toISOString()\n    },\n    seo_checks: seoChecks,\n    issues: issues\n  }\n}];"
+      },
+      "id": "audit-content-seo",
+      "name": "Audit Content SEO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.WEBSITE_URL }}",
+        "options": {
+          "followRedirect": true,
+          "timeout": 30000
+        }
+      },
+      "id": "crawl-website",
+      "name": "Crawl Website",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 1,
+      "position": [680, 500]
+    },
+    {
+      "parameters": {
+        "functionCode": "const htmlContent = $input.first().json.data;\nconst technicalIssues = [];\n\nif (typeof htmlContent === 'string') {\n  // Vérifications techniques\n  \n  // 1. Images sans attribut alt\n  const imgRegex = /<img[^>]*>/gi;\n  const images = htmlContent.match(imgRegex) || [];\n  let imagesWithoutAlt = 0;\n  \n  images.forEach(img => {\n    if (!img.includes('alt=') || img.includes('alt=\"\"') || img.includes(\"alt=''\")) {\n      imagesWithoutAlt++;\n    }\n  });\n  \n  if (imagesWithoutAlt > 0) {\n    technicalIssues.push({\n      type: 'missing_alt_text',\n      count: imagesWithoutAlt,\n      severity: 'medium',\n      description: `${imagesWithoutAlt} images sans attribut alt`\n    });\n  }\n  \n  // 2. Liens cassés internes (simulation)\n  const linkRegex = /<a[^>]+href=[\"']([^\"']+)[\"'][^>]*>/gi;\n  const links = [];\n  let match;\n  \n  while ((match = linkRegex.exec(htmlContent)) !== null) {\n    links.push(match[1]);\n  }\n  \n  const internalLinks = links.filter(link => \n    link.startsWith('/') || link.includes(process.env.WEBSITE_URL)\n  );\n  \n  // 3. Meta tags manquants\n  const metaIssues = [];\n  if (!htmlContent.includes('<meta name=\"description\"')) {\n    metaIssues.push('missing_meta_description');\n  }\n  if (!htmlContent.includes('<meta property=\"og:title\"')) {\n    metaIssues.push('missing_og_title');\n  }\n  if (!htmlContent.includes('<meta property=\"og:description\"')) {\n    metaIssues.push('missing_og_description');\n  }\n  if (!htmlContent.includes('<meta property=\"og:image\"')) {\n    metaIssues.push('missing_og_image');\n  }\n  \n  if (metaIssues.length > 0) {\n    technicalIssues.push({\n      type: 'missing_meta_tags',\n      issues: metaIssues,\n      severity: 'high',\n      description: `${metaIssues.length} meta tags manquants`\n    });\n  }\n  \n  // 4. Structure H1/H2\n  const h1Count = (htmlContent.match(/<h1[^>]*>/gi) || []).length;\n  const h2Count = (htmlContent.match(/<h2[^>]*>/gi) || []).length;\n  \n  if (h1Count === 0) {\n    technicalIssues.push({\n      type: 'missing_h1',\n      severity: 'high',\n      description: 'Aucun H1 trouvé sur la page'\n    });\n  } else if (h1Count > 1) {\n    technicalIssues.push({\n      type: 'multiple_h1',\n      count: h1Count,\n      severity: 'medium',\n      description: `${h1Count} balises H1 trouvées (recommandé: 1)`\n    });\n  }\n}\n\nreturn [{\n  json: {\n    technical_audit: {\n      total_issues: technicalIssues.length,\n      issues: technicalIssues,\n      audit_date: new Date().toISOString(),\n      page_url: process.env.WEBSITE_URL\n    }\n  }\n}];"
+      },
+      "id": "analyze-technical-seo",
+      "name": "Analyze Technical SEO",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [900, 500]
+    },
+    {
+      "parameters": {
+        "functionCode": "const contentAudit = $input.all()[0].json;\nconst technicalAudit = $input.all()[1].json;\n\n// Combiner les résultats\nconst combinedReport = {\n  audit_type: 'content_seo_health_check',\n  audit_date: new Date().toISOString(),\n  \n  // Résumé global\n  summary: {\n    total_articles: contentAudit.audit_summary.total_articles,\n    articles_with_issues: contentAudit.audit_summary.articles_with_issues,\n    avg_seo_score: Math.round(contentAudit.audit_summary.avg_seo_score),\n    technical_issues: technicalAudit.technical_audit.total_issues\n  },\n  \n  // Score global (0-100)\n  overall_health_score: Math.round(\n    (contentAudit.audit_summary.avg_seo_score * 0.7) + \n    (Math.max(0, 100 - (technicalAudit.technical_audit.total_issues * 10)) * 0.3)\n  ),\n  \n  // Recommandations prioritaires\n  priority_actions: [],\n  \n  // Détails\n  content_issues: contentAudit.issues,\n  technical_issues: technicalAudit.technical_audit.issues,\n  \n  // Métriques pour le dashboard\n  metrics: {\n    articles_missing_meta: contentAudit.issues.filter(i => \n      i.issues.includes('missing_meta_description')\n    ).length,\n    articles_outdated: contentAudit.issues.filter(i => \n      i.issues.includes('content_outdated')\n    ).length,\n    images_without_alt: technicalAudit.technical_audit.issues.find(i => \n      i.type === 'missing_alt_text'\n    )?.count || 0\n  }\n};\n\n// Générer des recommandations\nif (combinedReport.summary.articles_with_issues > 0) {\n  combinedReport.priority_actions.push(\n    `Optimiser ${combinedReport.summary.articles_with_issues} articles avec des problèmes SEO`\n  );\n}\n\nif (combinedReport.metrics.articles_missing_meta > 0) {\n  combinedReport.priority_actions.push(\n    `Ajouter des meta descriptions à ${combinedReport.metrics.articles_missing_meta} articles`\n  );\n}\n\nif (combinedReport.metrics.images_without_alt > 0) {\n  combinedReport.priority_actions.push(\n    `Ajouter des attributs alt à ${combinedReport.metrics.images_without_alt} images`\n  );\n}\n\n// Définir le niveau de santé\nif (combinedReport.overall_health_score >= 90) {\n  combinedReport.health_status = 'excellent';\n} else if (combinedReport.overall_health_score >= 75) {\n  combinedReport.health_status = 'good';\n} else if (combinedReport.overall_health_score >= 60) {\n  combinedReport.health_status = 'needs_improvement';\n} else {\n  combinedReport.health_status = 'critical';\n}\n\nreturn [{ json: combinedReport }];"
+      },
+      "id": "generate-health-report",
+      "name": "Generate Health Report",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1120, 400]
+    },
+    {
+      "parameters": {
+        "operation": "insert",
+        "schema": "marketing_ops",
+        "table": "seo_health_reports",
+        "columns": "audit_date, overall_health_score, health_status, total_articles, articles_with_issues, technical_issues_count, priority_actions, detailed_report",
+        "additionalFields": {}
+      },
+      "id": "save-health-report",
+      "name": "Save Health Report",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 1,
+      "position": [1340, 400],
+      "credentials": {
+        "postgres": {
+          "id": "postgres-main",
+          "name": "PostgreSQL Main"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.overall_health_score }}",
+              "operation": "smaller",
+              "value2": 70
+            }
+          ]
+        }
+      },
+      "id": "check-health-threshold",
+      "name": "Check Health Threshold",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [1340, 600]
+    },
+    {
+      "parameters": {
+        "functionCode": "const report = $json;\n\nconst alertMessage = `🔍 RAPPORT SANTÉ SEO HEBDOMADAIRE\\n\\n📊 Score global: ${report.overall_health_score}/100 (${report.health_status})\\n\\n📝 Articles analysés: ${report.summary.total_articles}\\n⚠️ Articles avec problèmes: ${report.summary.articles_with_issues}\\n🔧 Problèmes techniques: ${report.summary.technical_issues}\\n\\n🎯 ACTIONS PRIORITAIRES:\\n${report.priority_actions.map(action => `• ${action}`).join('\\n')}\\n\\n📅 Audit réalisé le: ${new Date(report.audit_date).toLocaleString('fr-FR', { timeZone: 'Europe/Paris' })}\\n\\n${report.overall_health_score < 60 ? '🚨 ATTENTION: Score critique, action immédiate requise!' : '💡 Optimisations recommandées pour améliorer le référencement'}`;\n\nreturn [{\n  json: {\n    alert_type: 'seo_health_report',\n    severity: report.overall_health_score < 60 ? 'critical' : 'warning',\n    message: alertMessage,\n    score: report.overall_health_score,\n    status: report.health_status\n  }\n}];"
+      },
+      "id": "format-health-alert",
+      "name": "Format Health Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [1560, 600]
+    }
+  ],
+  "connections": {
+    "Weekly Schedule (Monday 6AM)": {
+      "main": [
+        [
+          {
+            "node": "Get Published Content",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Crawl Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Published Content": {
+      "main": [
+        [
+          {
+            "node": "Audit Content SEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crawl Website": {
+      "main": [
+        [
+          {
+            "node": "Analyze Technical SEO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Content SEO": {
+      "main": [
+        [
+          {
+            "node": "Generate Health Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Technical SEO": {
+      "main": [
+        [
+          {
+            "node": "Generate Health Report",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Generate Health Report": {
+      "main": [
+        [
+          {
+            "node": "Save Health Report",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Check Health Threshold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Health Threshold": {
+      "main": [
+        [
+          {
+            "node": "Format Health Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "timezone": "Europe/Paris"
+  },
+  "id": "content-audit-seo-health-check"
+}
