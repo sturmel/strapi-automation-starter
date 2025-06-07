@@ -612,10 +612,10 @@ cp .env.example .env
 nano .env  # Éditer les mots de passe et clés nécessaires
 
 # 3. Lancer tous les services
-docker-compose up -d
+docker compose up -d
 
 # 4. Vérifier le déploiement
-docker-compose ps
+docker compose ps
 ```
 
 ### Vérification de l'Installation
@@ -775,7 +775,7 @@ nano ai-content-analysis.json
 #### Optimisation Performance
 
 ```yaml
-# docker-compose.override.yml
+# docker compose.override.yml
 version: '3.8'
 services:
   postgres:
@@ -936,7 +936,7 @@ L'intelligence artificielle est entièrement configurable via n8n selon vos beso
 #### JSON-LD et Données Structurées
 
 **🧠 Optimisation pour l'intelligence artificielle :**
-Le package `nuxt-jsonld` permet d'intégrer automatiquement des **données structurées Schema.org** optimisées pour les moteurs de recherche et l'IA (ChatGPT, Bard, etc.).
+Le package `nuxt-jsonld` permet d'intégrer automatiquement des **données structurées Schema.org** optimisées pour les moteurs de recherche et l'IA (ChatGPT, Gemini, etc.).
 
 ```typescript
 // Exemple d'implémentation JSON-LD pour une organisation
@@ -1350,10 +1350,10 @@ echo "🔄 Mise à jour de la plateforme..."
 ./scripts/backup.sh
 
 # 2. Pull des nouvelles images
-docker-compose pull
+docker compose pull
 
 # 3. Redémarrage avec zero-downtime
-docker-compose up -d --remove-orphans
+docker compose up -d --remove-orphans
 
 # 4. Vérification santé services
 sleep 30
@@ -1521,9 +1521,9 @@ const generateSeasonalOffers = async (weather_data, booking_history) => {
 **Diagnostic :**
 ```bash
 # Vérifier les logs
-docker-compose logs postgres
-docker-compose logs strapi
-docker-compose logs n8n
+docker compose logs postgres
+docker compose logs strapi
+docker compose logs n8n
 
 # Vérifier l'espace disque
 df -h
@@ -1539,21 +1539,21 @@ free -h
    sudo chown -R 999:999 ./postgres_data
    
    # Reset database
-   docker-compose down -v
-   docker-compose up -d postgres
+   docker compose down -v
+   docker compose up -d postgres
    ```
 
 2. **Strapi erreur build :**
    ```bash
    # Nettoyer cache Node.js
-   docker-compose exec strapi npm cache clean --force
-   docker-compose restart strapi
+   docker compose exec strapi npm cache clean --force
+   docker compose restart strapi
    ```
 
 3. **n8n workflows inactifs :**
    ```bash
    # Redémarrer n8n
-   docker-compose restart n8n
+   docker compose restart n8n
    
    # Réactiver workflows via interface
    # http://localhost:5678 → Workflows → Toggle Active
@@ -1567,27 +1567,10 @@ free -h
 docker system prune -a
 
 # 2. Optimiser PostgreSQL
-docker-compose exec postgres psql -U admin_user -c "VACUUM ANALYZE;"
+docker compose exec postgres psql -U admin_user -c "VACUUM ANALYZE;"
 
 # 3. Vider cache Redis
-docker-compose exec redis redis-cli FLUSHALL
-```
-
-#### APIs externes en erreur
-
-**Diagnostic APIs :**
-```bash
-# Test Google Analytics
-curl -H "Authorization: Bearer $GOOGLE_TOKEN" \
-  "https://analyticsdata.googleapis.com/v1beta/properties/$PROPERTY_ID:runReport"
-
-# Test Brevo
-curl -H "api-key: $BREVO_API_KEY" \
-  "https://api.brevo.com/v3/account"
-
-# Test OpenAI
-curl -H "Authorization: Bearer $OPENAI_API_KEY" \
-  "https://api.openai.com/v1/models"
+docker compose exec redis redis-cli FLUSHALL
 ```
 
 ### 📞 Support et Communauté
@@ -1641,7 +1624,7 @@ Cette plateforme **Strapi Automation Starter** représente un **écosystème de 
 ### 🎯 Technologies de Pointe Intégrées
 
 - **Nuxt 3.17.5** avec TypeScript pour un développement moderne
-- **JSON-LD automatique** pour le référencement IA (ChatGPT, Bard)
+- **JSON-LD automatique** pour le référencement IA (ChatGPT, Gemini)
 - **GSAP** pour des animations fluides et engageantes
 - **TailwindCSS 4** avec système de design modulaire
 - **Google Analytics 4** avec tracking avancé
@@ -1650,7 +1633,7 @@ Cette plateforme **Strapi Automation Starter** représente un **écosystème de 
 
 ### 🚀 Prochaines Étapes
 
-1. **Installation** : `docker-compose up -d` et c'est parti !
+1. **Installation** : `docker compose up -d` et c'est parti !
 2. **Configuration** : Modifier les variables .env selon vos besoins
 3. **Personnalisation** : Créer vos Content Types dans Strapi
 4. **Intégrations** : Configurer vos APIs dans n8n
